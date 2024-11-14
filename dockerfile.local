@@ -9,15 +9,14 @@ USER fastapi
 
 ENV PYTHONUNBUFFERED 1
 
-WORKDIR /home/fastapi/cerberus
+WORKDIR /home/fastapi/studere
 
 ENV PATH $PATH:/home/fastapi/.local/bin
 
 COPY poetry.lock pyproject.toml ./
 
 RUN pipx install poetry==1.8
-RUN poetry config virtualenvs.create false
-RUN poetry install --no-root
+RUN poetry install
 
 COPY . .
 

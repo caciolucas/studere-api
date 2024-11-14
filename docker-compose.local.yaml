@@ -8,6 +8,8 @@ services:
     container_name: studere-api
     volumes:
       - .:/home/fastapi/studere
+    ports:
+      - 8000:8000
       
   db:
     image: postgres:12-alpine

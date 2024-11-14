@@ -12,7 +12,7 @@ class StudyPlanTopicBase(BaseModel):
     completed_at: Optional[datetime] = None
 
     class Config:
-        orm_mode = True
+        from_attibutes = True
 
 
 class StudyPlanTopicCreateUpdate(StudyPlanTopicBase):
@@ -57,7 +57,7 @@ class StudyPlanResponse(BaseModel):
     created_at: datetime
 
     class Config:
-        orm_mode = True
+        from_attibutes = True
 
 
 class StudyPlanAIGenerate(BaseModel):
