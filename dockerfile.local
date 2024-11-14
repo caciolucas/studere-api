@@ -1,0 +1,24 @@
+FROM python:3.11
+
+RUN apt update
+RUN apt install pipx xclip -y 
+
+RUN useradd -ms /bin/bash fastapi
+
+USER fastapi
+
+ENV PYTHONUNBUFFERED 1
+
+WORKDIR /home/fastapi/cerberus
+
+ENV PATH $PATH:/home/fastapi/.local/bin
+
+COPY poetry.lock pyproject.toml ./
+
+RUN pipx install poetry==1.8
+RUN poetry config virtualenvs.create false
+RUN poetry install --no-root
+
+COPY . .
+
+CMD tail -f /dev/null
