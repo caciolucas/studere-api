@@ -21,7 +21,8 @@ class StudyPlanTopicCreateUpdate(StudyPlanTopicBase):
 
 class StudyPlanTopicResponse(StudyPlanTopicBase):
     id: uuid.UUID
-    created_at: datetime
+    title: str
+    created_at: Optional[datetime]
 
 
 # Schema for StudyPlan with topics list

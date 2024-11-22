@@ -48,21 +48,3 @@ class StudyPlanTopic(Base):
 
     completed_at = Column(DateTime, nullable=True)
     created_at = Column(DateTime, server_default=func.now())
-
-
-class StudySession(Base):
-    __tablename__ = "study_sessions"
-
-    id = Column(UUID(as_uuid=True), primary_key=True, index=True, default=uuid.uuid4)
-    title = Column(String, nullable=False)
-    description = Column(Text)
-
-    plan_id = Column(UUID(as_uuid=True), ForeignKey("study_plans.id"))
-    plan = relationship("StudyPlan", back_populates="sessions")
-
-    topics = relationship(
-        "StudyPlanTopic", secondary=study_session_topics, back_populates="sessions"
-    )
-
-    completed_at = Column(DateTime, nullable=True)
-    created_at = Column(DateTime, server_default=func.now())
