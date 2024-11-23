@@ -1,8 +1,14 @@
-import json
 from datetime import datetime
 from typing import List, Optional
 
 from sqalchemy.orm import Session
+
+from core.exceptions import (
+    NotFoundError,
+    PauseInactiveSessionError,
+    SessionAlreadyPausedError,
+    SessionNotPausedError
+)
 
 from core.service import BaseService
 from models.study_session import StudySession
@@ -28,6 +34,9 @@ class StudySessionService(BaseService):
         ended_at: Optional[datetime] = None,
         total_pause_time: Optional[float] = 0.0
     ) -> StudySession:
+        if started_at and ended_at and started_at > ended_at:
+            raise ValueError("The start time cannot be greater than the end time.")
+
         study_session_model = StudySession(
             title=title,
             plan_id=plan_id,
@@ -43,27 +52,35 @@ class StudySessionService(BaseService):
         return self.repository.create_study_session(new_study_session)
 
     def get_study_session(self, study_session_id: str):
-        return self.repository.retrieve_study_session(study_session_id)
+        study_session = self.repository.retrieve_study_session(study_session_id)
+        if study_session is None:
+            raise NotFoundError(f"Study session not found: {study_session_id}")
 
     def pause_study_session(self, study_session_id: str):
-        study_session = self.repository.retrieve_study_session(study_session_id)
+        study_session = self.get_study_session(study_session_id)
 
         if not study_session.is_active:
-            raise Exception("The session you're trying to pause is not active.")
+            raise PauseInactiveSessionError("The session you're trying to pause is not active.")
         if study_session.is_paused:
-            raise Exception("The session you're trying to pause is already paused.")
+            raise SessionAlreadyPausedError("The session you're trying to pause is already paused.")
 
         return self.repository.pause_study_session(study_session_id, datetime.now())
 
     def unpause_study_session(self, study_session_id: str):
-        study_session = self.repository.retrieve_study_session(study_session_id)
+        study_session = self.get_study_session(study_session_id)
 
         if not study_session.is_active:
-            raise Exception("The session you're trying to pause is not active.")
+            raise PauseInactiveSessionError("The session you're trying to pause is not active.")
         if not study_session.is_paused:
-            raise Exception("The session you're trying to unpause is not paused.")
+            raise SessionNotPausedError("The session you're trying to unpause is not paused.")
 
-        return self.repository.update_study_session(study_session_id, datetime.now())
+        elapsed_time = (
+            (datetime.now() - study_session.last_pause_time).total_seconds()
+            if study_session.last_pause_time
+            else 0.0
+        )
+
+        return self.repository.update_study_session(study_session_id, elapsed_time)
 
     def list_study_sessions(self, curr_user_id: str):
         return self.repository.retrieve_user_sessions(curr_user_id)
@@ -79,10 +96,10 @@ class StudySessionService(BaseService):
         ended_at: Optional[datetime] = None,
         total_pause_time: Optional[float] = None
     ) -> StudySession:
-        study_session = self.retrieve_study_session(study_session_id)
+        if started_at and ended_at and started_at > ended_at:
+            raise ValueError("The start time cannot be greater than the end time.")
 
-        if not study_session:
-            raise Exception("Session not found.")
+        study_session = self.get_study_session(study_session_id)
 
         (
             lambda fields: [
@@ -102,4 +119,6 @@ class StudySessionService(BaseService):
         return self.repository.update_study_session(study_session)
 
     def delete_study_session(self, study_session_id: str):
+        # try to get it first, so if it doesnt exist
+        self.get_study_session(study_session_id)
         self.repository.delete_study_session(study_session_id)

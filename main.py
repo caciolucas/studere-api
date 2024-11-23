@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 
-from api.routers import assignment_router, course_router, studyplan_router, user_router
+from api.routers import assignment_router, course_router, studyplan_router, user_router, study_session_router
 
 app = FastAPI()
 
@@ -10,3 +10,4 @@ app.include_router(
     assignment_router.router, prefix="/assignments", tags=["Assignments"]
 )
 app.include_router(course_router.router, prefix="/courses", tags=["Courses"])
+app.include_router(study_session_router, prefix="/sessions", tags=["Sessions"])
