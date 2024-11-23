@@ -3,6 +3,8 @@ from datetime import datetime
 
 from core.repository import BaseRepository
 from models.study_session import StudySession
+from models.study_plan import StudyPlan
+from models.course import Course
 
 
 class StudySessionRepository(BaseRepository):
@@ -26,6 +28,7 @@ class StudySessionRepository(BaseRepository):
             self.db.query(StudySession).filter(StudySession.id == study_session_id).first()
         )
 
+        # should this verification be really done?
         if not study_session:
             raise ValueError("Study session not found!")
 
@@ -58,7 +61,6 @@ class StudySessionRepository(BaseRepository):
         if not study_session:
             raise ValueError("Study session not found!")
 
-        # por favor checar se esse elapsed time não era coisa do service, sei lá
         elapsed_time = (
             (unpause_time - study_session.last_pause_time).total_seconds()
             if study_session.last_pause_time
@@ -72,3 +74,12 @@ class StudySessionRepository(BaseRepository):
         self.db.commit()
         self.db.refresh(study_session)
         return study_session
+
+    def retrieve_user_sessions(self, curr_user_id: str):
+        return (
+            self.db.query(StudySession)
+            .join(StudyPlan, StudySession.plan_id == StudyPlan.id)
+            .join(Course, StudyPlan.course_id == Course.id)
+            .filter(Course.user_id == curr_user_id)
+            .all()
+        )
