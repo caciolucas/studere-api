@@ -4,14 +4,9 @@ from sqlalchemy import Column, DateTime, String, ForeignKey, Table, Text, Float,
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 
-from db.session import Base
+from models.study_plan import study_session_topics
 
-study_session_topics = Table(
-    "study_session_topics",
-    Base.metadata,
-    Column("session_id", UUID(as_uuid=True), ForeignKey("study_sessions.id")),
-    Column("topic_id", UUID(as_uuid=True), ForeignKey("study_plan_topics.id")),
-)
+from db.session import Base
 
 
 class StudySession(Base):

@@ -13,9 +13,12 @@ class StudySessionBase(BaseModel):
     notes: Optional[str] = None
 
     plan_id: uuid.UUID
+    # TODO: this wont work, since I would be needing to pass an entire JSON
+    # each time I try to add a topic. I need to inspect a way to just pass a list of IDS, and the
+    # db engine should do the job for me.
     topics: List[StudyPlanTopicResponse]
 
-    started_at: datetime
+    started_at: Optional[datetime] = None
     ended_at: Optional[datetime] = None
     total_pause_time: Optional[float] = 0.0
 

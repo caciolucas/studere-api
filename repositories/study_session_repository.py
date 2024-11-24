@@ -66,7 +66,7 @@ class StudySessionRepository(BaseRepository):
         except Exception as e:
             raise RepositoryError(f"Operation failed due to internal database error: {e}") from e
 
-    def end_pause(self, study_session_id: str, elapsed_time: float) -> StudySession:
+    def unpause_study_session(self, study_session_id: str, elapsed_time: float) -> StudySession:
         try:
             study_session = (
                 self.db.query(StudySession).filter(StudySession.id == study_session_id).first()

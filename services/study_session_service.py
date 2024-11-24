@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import List, Optional
 
-from sqalchemy.orm import Session
+from sqlalchemy.orm import Session
 
 from core.exceptions import (
     NotFoundError,
@@ -30,31 +30,31 @@ class StudySessionService(BaseService):
 
         description: Optional[str] = None,
         notes: Optional[str] = None,
-        started_at: Optional[datetime] = None,
+        started_at: Optional[datetime] = datetime.now(),
         ended_at: Optional[datetime] = None,
         total_pause_time: Optional[float] = 0.0
     ) -> StudySession:
-        if started_at and ended_at and started_at > ended_at:
+        if ended_at and started_at > ended_at:
             raise ValueError("The start time cannot be greater than the end time.")
 
-        study_session_model = StudySession(
+        new_study_session = StudySession(
             title=title,
             plan_id=plan_id,
             topics=topics,
             description=description,
             notes=notes,
-            started_at=started_at if started_at else datetime.now(),
+            started_at=started_at,
             ended_at=ended_at,
             total_pause_time=total_pause_time
         )
 
-        new_study_session = StudySession(study_session_model)
         return self.repository.create_study_session(new_study_session)
 
     def get_study_session(self, study_session_id: str):
         study_session = self.repository.retrieve_study_session(study_session_id)
         if study_session is None:
             raise NotFoundError(f"Study session not found: {study_session_id}")
+        return study_session
 
     def pause_study_session(self, study_session_id: str):
         study_session = self.get_study_session(study_session_id)
@@ -80,7 +80,7 @@ class StudySessionService(BaseService):
             else 0.0
         )
 
-        return self.repository.update_study_session(study_session_id, elapsed_time)
+        return self.repository.unpause_study_session(study_session_id, elapsed_time)
 
     def list_study_sessions(self, curr_user_id: str):
         return self.repository.retrieve_user_sessions(curr_user_id)

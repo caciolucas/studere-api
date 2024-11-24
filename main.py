@@ -10,4 +10,4 @@ app.include_router(
     assignment_router.router, prefix="/assignments", tags=["Assignments"]
 )
 app.include_router(course_router.router, prefix="/courses", tags=["Courses"])
-app.include_router(study_session_router, prefix="/sessions", tags=["Sessions"])
+app.include_router(study_session_router.router, prefix="/sessions", tags=["Sessions"])

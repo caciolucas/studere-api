@@ -95,6 +95,7 @@ class StudyPlanService(BaseService):
         if isinstance(json_content, list):
             json_content = json_content[0]
 
+        course = self.repository.db.merge(course)
         study_plan = StudyPlan(title=json_content["title"], course=course)
         study_plan = self.repository.create_study_plan(study_plan)
 

@@ -30,7 +30,7 @@ def create_study_session(
 ):
     try:
         study_session_service = StudySessionService(db)
-        study_session = study_session_service.create_study_session(
+        return study_session_service.create_study_session(
             title=body.title,
             plan_id=body.plan_id,
             topics=body.topics,
@@ -40,7 +40,6 @@ def create_study_session(
             ended_at=body.ended_at,
             total_pause_time=body.total_pause_time
         )
-        return study_session
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
     except RepositoryError as e:
@@ -91,7 +90,7 @@ def get_study_session(
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.delete("/study_session_id", status_code=204)
+@router.delete("/{study_session_id}", status_code=204)
 def delete_study_session(
     study_session_id: str,
     db: Session = Depends(get_db),
