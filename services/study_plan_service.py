@@ -47,6 +47,12 @@ class StudyPlanService(BaseService):
             self.course_service.retrieve_course(course_id, user_id)
         return self.repository.list_study_plans(user_id, course_id)
 
+    def retrieve_study_topic(self, study_topic_id: str):
+        study_topic = self.repository.retrieve_study_topic(study_topic_id)
+        if not study_topic:
+            raise HTTPException(status_code=404)
+        return study_topic
+
     def retrieve_study_plan(self, study_plan_id: str, current_user_id: str):
         study_plan = self.repository.retrieve_study_plan(study_plan_id)
         if not study_plan or study_plan.course.user_id != current_user_id:

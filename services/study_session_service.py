@@ -1,4 +1,5 @@
 from datetime import datetime
+from uuid import UUID
 from typing import List, Optional
 
 from sqlalchemy.orm import Session
@@ -13,7 +14,6 @@ from core.exceptions import (
 from core.service import BaseService
 from models.study_session import StudySession
 from repositories.study_session_repository import StudySessionRepository
-from schemas.study_plan_schemas import StudyPlanTopicResponse
 from services.study_plan_service import StudyPlanService
 
 
@@ -25,9 +25,8 @@ class StudySessionService(BaseService):
     def create_study_session(
         self,
         title: str,
-        plan_id: str,
-        topics: List[StudyPlanTopicResponse],
-
+        plan_id: UUID,
+        topics: Optional[List[UUID]],
         description: Optional[str] = None,
         notes: Optional[str] = None,
         started_at: Optional[datetime] = datetime.now(),
@@ -40,13 +39,19 @@ class StudySessionService(BaseService):
         new_study_session = StudySession(
             title=title,
             plan_id=plan_id,
-            topics=topics,
             description=description,
             notes=notes,
             started_at=started_at,
             ended_at=ended_at,
             total_pause_time=total_pause_time
         )
+
+        retrieved_topics = [
+            self.study_plan_service.retrieve_study_topic(topic_id)
+            for topic_id
+            in topics
+        ]
+        new_study_session.topics = retrieved_topics
 
         return self.repository.create_study_session(new_study_session)
 
@@ -82,16 +87,16 @@ class StudySessionService(BaseService):
 
         return self.repository.unpause_study_session(study_session_id, elapsed_time)
 
-    def list_study_sessions(self, curr_user_id: str):
+    def list_study_sessions(self, curr_user_id: UUID):
         return self.repository.retrieve_user_sessions(curr_user_id)
 
     def update_study_session(
         self,
-        study_session_id: str,
+        study_session_id: UUID,
         title: Optional[str] = None,
         description: Optional[str] = None,
         notes: Optional[str] = None,
-        topics: Optional[List[StudyPlanTopicResponse]] = None,
+        topics: Optional[List[UUID]] = None,
         started_at: Optional[datetime] = None,
         ended_at: Optional[datetime] = None,
         total_pause_time: Optional[float] = None
@@ -101,12 +106,17 @@ class StudySessionService(BaseService):
 
         study_session = self.get_study_session(study_session_id)
 
+        topics = [
+            self.study_plan_service.retrieve_study_topic(topic_id)
+            for topic_id
+            in topics
+        ] if topics else None
+
         (
             lambda fields: [
                 setattr(study_session, field, value) for field, value in fields.items()
             ]
-        )
-        (
+        )(
             {
                 field: value
                 for field, value in locals().items()

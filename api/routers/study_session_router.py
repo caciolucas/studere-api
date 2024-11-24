@@ -15,7 +15,7 @@ from core.exceptions import (
 from core.security import get_current_user
 from db.session import get_db
 from models.user import User
-from schemas.study_session_schemas import StudySessionCreateUpdate, StudySessionResponse
+from schemas.study_session_schemas import StudySessionCreate, StudySessionUpdate, StudySessionResponse
 
 from services.study_session_service import StudySessionService
 
@@ -24,7 +24,7 @@ router = APIRouter()
 
 @router.post("/", response_model=StudySessionResponse, status_code=201)
 def create_study_session(
-    body: StudySessionCreateUpdate,
+    body: StudySessionCreate,
     db: Session = Depends(get_db),
     curr_user: User = Depends(get_current_user)
 ):
@@ -49,16 +49,15 @@ def create_study_session(
 @router.put("/{study_session_id}", response_model=StudySessionResponse, status_code=201)
 def update_study_session(
     study_session_id: uuid.UUID,
-    body: StudySessionCreateUpdate,
+    body: StudySessionUpdate,
     db: Session = Depends(get_db),
     curr_user: User = Depends(get_current_user)
 ):
     try:
         study_session_service = StudySessionService(db)
-        study_session = study_session_service.update_study_session(
+        return study_session_service.update_study_session(
             study_session_id=study_session_id,
             title=body.title,
-            plan_id=body.plan_id,
             topics=body.topics,
             description=body.description,
             notes=body.notes,
@@ -66,7 +65,6 @@ def update_study_session(
             ended_at=body.ended_at,
             total_pause_time=body.total_pause_time
         )
-        return study_session
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
     except RepositoryError as e:
@@ -81,9 +79,7 @@ def get_study_session(
 ):
     try:
         study_session_service = StudySessionService(db)
-        study_session = study_session_service.get_study_session(study_session_id)
-
-        return study_session
+        return study_session_service.get_study_session(study_session_id)
     except NotFoundError as e:
         raise HTTPException(status_code=404, detail=str(e))
     except RepositoryError as e:
@@ -105,9 +101,8 @@ def delete_study_session(
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.get("/list_sessions", response_model=List[StudySessionResponse])
+@router.get("/list_sessions/", response_model=List[StudySessionResponse])
 def list_study_sessions(
-        self,
         db: Session = Depends(get_db),
         curr_user: User = Depends(get_current_user)
 ):

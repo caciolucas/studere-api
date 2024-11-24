@@ -15,6 +15,9 @@ class StudyPlanRepository(BaseRepository):
     def retrieve_study_plan(self, study_plan_id: str) -> StudyPlan:
         return self.db.query(StudyPlan).filter(StudyPlan.id == study_plan_id).first()
 
+    def retrieve_study_topic(self, study_topic_id: str) -> StudyPlanTopic:
+        return self.db.query(StudyPlanTopic).filter(StudyPlanTopic.id == study_topic_id).first()
+
     def update_study_plan(self, study_plan: StudyPlan) -> StudyPlan:
         self.db.merge(study_plan)
         self.db.commit()

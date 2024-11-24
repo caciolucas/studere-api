@@ -1,12 +1,19 @@
 import uuid
+from enum import Enum as PyEnum
 
-from sqlalchemy import Column, DateTime, String, ForeignKey, Table, Text, Float, Boolean, func
+from sqlalchemy import Column, DateTime, String, ForeignKey, Text, Float, Boolean, func
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 
 from models.study_plan import study_session_topics
 
 from db.session import Base
+
+
+class SessionState(PyEnum):
+    ACTIVE = "active"
+    PAUSED = "paused"
+    COMPLETED = "completed"
 
 
 class StudySession(Base):
