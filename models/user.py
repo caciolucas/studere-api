@@ -1,19 +1,28 @@
 import uuid
+from typing import TYPE_CHECKING, List
+from datetime import datetime
 
-from sqlalchemy import Column, DateTime, String, func
+from sqlalchemy import DateTime, String, func
 from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from db.session import Base
+
+if TYPE_CHECKING:
+    from models.term import Term
 
 
 class User(Base):
     __tablename__ = "users"
 
-    id = Column(UUID(as_uuid=True), primary_key=True, index=True, default=uuid.uuid4)
-    email = Column(String, unique=True, nullable=False)
-    password = Column(String, nullable=False)
-    full_name = Column(String, nullable=False)
+    id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), primary_key=True, index=True, default=uuid.uuid4
+    )
+    email: Mapped[str] = mapped_column(String, nullable=False, unique=True)
+    password: Mapped[str] = mapped_column(String, nullable=False)
+    full_name: Mapped[str] = mapped_column(String)
 
-    terms = relationship("Term", back_populates="user", cascade="all, delete-orphan")
-    created_at = Column(DateTime, server_default=func.now())
+    terms: Mapped[List["Term"]] = relationship(
+        "Term", back_populates="user", cascade="all, delete-orphan"
+    )
+    created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())

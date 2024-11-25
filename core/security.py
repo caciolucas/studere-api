@@ -22,17 +22,18 @@ def create_access_token(data: dict, expires_delta: timedelta = None):
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
 
+
 def verify_token_and_get_user_id(token: str):
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Credenciais inválidas",
         headers={"WWW-Authenticate": "Bearer"},
     )
-    
+
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        user_id: str = payload.get("sub")
-        
+        user_id: UUID = payload.get("sub")
+
         if user_id is None:
             raise credentials_exception
     except jwt.ExpiredSignatureError:
@@ -43,7 +44,7 @@ def verify_token_and_get_user_id(token: str):
         )
     except jwt.InvalidTokenError:
         raise credentials_exception
-    
+
     return uuid.UUID(user_id)
 
 
@@ -85,4 +86,3 @@ def get_current_user(db: Session = Depends(get_db), authorization: str = Header(
         )
 
     return user
-

@@ -1,5 +1,8 @@
 from core.repository import BaseRepository
 from models.course import Course
+from typing import Optional
+from uuid import UUID
+from models.term import Term
 
 
 class CourseRepository(BaseRepository):
@@ -9,7 +12,7 @@ class CourseRepository(BaseRepository):
         self.db.refresh(course)
         return course
 
-    def retrieve_course(self, course_id: str) -> Course:
+    def retrieve_course(self, course_id: UUID) -> Course:
         return self.db.query(Course).filter(Course.id == course_id).first()
 
     def update_course(self, course: Course) -> Course:
@@ -18,13 +21,21 @@ class CourseRepository(BaseRepository):
         self.db.refresh(course)
         return course
 
-    def delete_course(self, course_id: str) -> None:
+    def delete_course(self, course_id: UUID) -> None:
         course = self.db.query(Course).filter(Course.id == course_id).first()
         if course:
             self.db.delete(course)
             self.db.commit()
 
-    def list_courses(self, user_id) -> list[Course]:
-        if user_id:
-            return self.db.query(Course).filter(Course.user_id == user_id).all()
-        return self.db.query(Course).all()
+    def list_courses(
+        self, user_id: UUID, term_id: Optional[UUID] = None
+    ) -> list[Course]:
+        if term_id:
+            return self.db.query(Course).filter(Course.term_id == term_id).all()
+
+        return (
+            self.db.query(Course)
+            .join(Term, Term.id == Course.term_id)
+            .filter(Term.user_id == user_id)
+            .all()
+        )

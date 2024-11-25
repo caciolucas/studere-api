@@ -1,5 +1,6 @@
 from typing import List
 from datetime import datetime
+from uuid import UUID
 
 from core.exceptions import RepositoryError
 
@@ -17,7 +18,9 @@ class StudySessionRepository(BaseRepository):
             self.db.refresh(study_session)
             return study_session
         except Exception as e:
-            raise RepositoryError(f"Operation failed due to internal database error: {e}") from e
+            raise RepositoryError(
+                f"Operation failed due to internal database error: {e}"
+            ) from e
 
     def update_study_session(self, study_session: StudySession) -> StudySession:
         try:
@@ -26,35 +29,57 @@ class StudySessionRepository(BaseRepository):
             self.db.refresh(study_session)
             return study_session
         except Exception as e:
-            raise RepositoryError(f"Operation failed due to internal database error: {e}") from e
+            raise RepositoryError(
+                f"Operation failed due to internal database error: {e}"
+            ) from e
 
     def retrieve_study_session(self, study_session_id: str) -> StudySession:
         try:
-            return self.db.query(StudySession).filter(StudySession.id == study_session_id).first()
+            return (
+                self.db.query(StudySession)
+                .filter(StudySession.id == study_session_id)
+                .first()
+            )
         except Exception as e:
-            raise RepositoryError(f"Operation failed due to internal database error: {e}") from e
+            raise RepositoryError(
+                f"Operation failed due to internal database error: {e}"
+            ) from e
 
     def delete_study_session(self, study_session_id: str) -> None:
         try:
             study_session = (
-                self.db.query(StudySession).filter(StudySession.id == study_session_id).first()
+                self.db.query(StudySession)
+                .filter(StudySession.id == study_session_id)
+                .first()
             )
 
             self.db.delete(study_session)
             self.db.commit()
         except Exception as e:
-            raise RepositoryError(f"Operation failed due to internal database error: {e}") from e
+            raise RepositoryError(
+                f"Operation failed due to internal database error: {e}"
+            ) from e
 
     def list_study_session(self, plan_id: str) -> List[StudySession]:
         try:
-            return self.db.query(StudySession).filter(StudySession.plan_id == plan_id).all()
+            return (
+                self.db.query(StudySession)
+                .filter(StudySession.plan_id == plan_id)
+                .all()
+            )
         except Exception as e:
-            raise RepositoryError(f"Operation failed due to internal database error: {e}") from e
+            raise RepositoryError(
+                f"Operation failed due to internal database error: {e}"
+            ) from e
 
-    def pause_study_session(self, study_session_id: str, pause_start: datetime) -> StudySession:
+    def pause_study_session(
+        self, study_session_id: str, pause_start: datetime
+    ) -> StudySession:
         try:
             study_session = (
-                self.db.query(StudySession).filter(StudySession.id == study_session_id).first()
+                self.db.query(StudySession)
+                .filter(StudySession.id == study_session_id)
+                .first()
             )
 
             study_session.is_paused = True
@@ -64,12 +89,18 @@ class StudySessionRepository(BaseRepository):
             self.db.refresh(study_session)
             return study_session
         except Exception as e:
-            raise RepositoryError(f"Operation failed due to internal database error: {e}") from e
+            raise RepositoryError(
+                f"Operation failed due to internal database error: {e}"
+            ) from e
 
-    def unpause_study_session(self, study_session_id: str, elapsed_time: float) -> StudySession:
+    def unpause_study_session(
+        self, study_session_id: str, elapsed_time: float
+    ) -> StudySession:
         try:
             study_session = (
-                self.db.query(StudySession).filter(StudySession.id == study_session_id).first()
+                self.db.query(StudySession)
+                .filter(StudySession.id == study_session_id)
+                .first()
             )
 
             study_session.is_paused = False
@@ -80,9 +111,11 @@ class StudySessionRepository(BaseRepository):
             self.db.refresh(study_session)
             return study_session
         except Exception as e:
-            raise RepositoryError(f"Operation failed due to internal database error: {e}") from e
+            raise RepositoryError(
+                f"Operation failed due to internal database error: {e}"
+            ) from e
 
-    def retrieve_user_sessions(self, curr_user_id: str):
+    def retrieve_user_sessions(self, curr_user_id: UUID):
         try:
             return (
                 self.db.query(StudySession)
@@ -92,4 +125,6 @@ class StudySessionRepository(BaseRepository):
                 .all()
             )
         except Exception as e:
-            raise RepositoryError(f"Operation failed due to internal database error: {e}") from e
+            raise RepositoryError(
+                f"Operation failed due to internal database error: {e}"
+            ) from e

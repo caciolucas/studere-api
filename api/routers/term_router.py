@@ -1,6 +1,6 @@
-from uuid import UUID
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
+from uuid import UUID
 
 from core.security import get_current_user
 from db.session import get_db
@@ -17,70 +17,68 @@ def create_term(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-    course_service = TermService(db)
-    course = course_service.create_term(
+    term_service = TermService(db)
+    term = term_service.create_term(
         body.name, body.start_date, body.end_date, current_user.id
     )
-    return course
+    return term
 
 
 @router.get("")
 def list_terms(
     db: Session = Depends(get_db), current_user: User = Depends(get_current_user)
 ):
-    course_service = TermService(db)
-    terms = course_service.list_terms(current_user.id)
+    term_service = TermService(db)
+    terms = term_service.list_terms(current_user.id)
 
     return terms
 
 
-@router.get("/{course_id}")
-def retrieve_course(
-    course_id: str,
+@router.get("/{term_id}")
+def retrieve_term(
+    term_id: UUID,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-    course_service = TermService(db)
-    course = course_service.retrieve_course(course_id, current_user.id)
+    term_service = TermService(db)
+    term = term_service.retrieve_term(term_id, current_user.id)
 
-    return course
+    return term
 
 
-#
-#
-# @router.put("/{course_id}")
-# @router.patch("/{course_id}")
-# def update_course(
-#     course_id: str,
-#     body: CourseCreateUpdate,
-#     db: Session = Depends(get_db),
-#     current_user: User = Depends(get_current_user),
-# ):
-#     course_service = TermService(db)
-#     course = course_service.update_course(course_id, body.name, current_user.id)
-#     return course
-#
-#
-# @router.delete("/{course_id}", status_code=204)
-# def delete_task(
-#     course_id: str,
-#     db: Session = Depends(get_db),
-#     current_user: User = Depends(get_current_user),
-# ):
-#     course_service = TermService(db)
-#     course_service.delete_course(course_id, current_user.id)
-#
-#     return None
-#
-#
-# @router.get("/{course_id}/assignments")
-# def list_course_assignments(
-#     course_id: str,
-#     db: Session = Depends(get_db),
-#     current_user: User = Depends(get_current_user),
-# ):
-#     assignment_service = AssignmentService(db)
-#     assignments = assignment_service.list_assignments(current_user.id, course_id)
-#
-#     return assignments
-#
+@router.get("/{term_id}/courses")
+def list_term_courses(
+    term_id: UUID,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    term_service = TermService(db)
+    term = term_service.list_term_courses(term_id, current_user.id)
+
+    return term
+
+
+@router.put("/{term_id}")
+def update_term(
+    term_id: UUID,
+    body: TermCreateUpdate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    term_service = TermService(db)
+    term = term_service.update_term(
+        term_id, current_user.id, body.name, body.start_date, body.end_date
+    )
+    return term
+
+
+@router.delete("/{term_id}", status_code=204)
+def delete_term(
+    term_id: UUID,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    term_service = TermService(db)
+    term_service.delete_term(term_id, current_user.id)
+
+    return None

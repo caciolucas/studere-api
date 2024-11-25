@@ -1,3 +1,4 @@
+from uuid import UUID
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
@@ -15,10 +16,9 @@ router = APIRouter()
 def create_course(
     body: CourseCreateUpdate,
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
 ):
     course_service = CourseService(db)
-    course = course_service.create_course(body.name, current_user.id)
+    course = course_service.create_course(body.name, body.term_id)
     return course
 
 
@@ -34,7 +34,7 @@ def list_courses(
 
 @router.get("/{course_id}")
 def retrieve_course(
-    course_id: str,
+    course_id: UUID,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
@@ -45,9 +45,8 @@ def retrieve_course(
 
 
 @router.put("/{course_id}")
-@router.patch("/{course_id}")
 def update_course(
-    course_id: str,
+    course_id: UUID,
     body: CourseCreateUpdate,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
@@ -59,7 +58,7 @@ def update_course(
 
 @router.delete("/{course_id}", status_code=204)
 def delete_task(
-    course_id: str,
+    course_id: UUID,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
@@ -71,7 +70,7 @@ def delete_task(
 
 @router.get("/{course_id}/assignments")
 def list_course_assignments(
-    course_id: str,
+    course_id: UUID,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):

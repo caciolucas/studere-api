@@ -1,5 +1,6 @@
 from core.repository import BaseRepository
 from models.term import Term
+from uuid import UUID
 
 
 class TermRepository(BaseRepository):
@@ -9,7 +10,7 @@ class TermRepository(BaseRepository):
         self.db.refresh(term)
         return term
 
-    def retrieve_term(self, term_id: str) -> Term:
+    def retrieve_term(self, term_id: UUID) -> Term:
         return self.db.query(Term).filter(Term.id == term_id).first()
 
     def update_term(self, term: Term) -> Term:
@@ -18,7 +19,7 @@ class TermRepository(BaseRepository):
         self.db.refresh(term)
         return term
 
-    def delete_term(self, term_id: str) -> None:
+    def delete_term(self, term_id: UUID) -> None:
         term = self.db.query(Term).filter(Term.id == term_id).first()
         if term:
             self.db.delete(term)

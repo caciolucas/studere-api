@@ -1,3 +1,4 @@
+from uuid import UUID
 from core.repository import BaseRepository
 from models.user import User
 
@@ -12,5 +13,5 @@ class UserRepository(BaseRepository):
     def get_user_by_email(self, email: str) -> User:
         return self.db.query(User).filter(User.email == email).first()
 
-    def get_user_by_id(self, id: str) -> User:
+    def get_user_by_id(self, id: UUID) -> User:
         return self.db.query(User).filter(User.id == id).first()

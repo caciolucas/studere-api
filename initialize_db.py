@@ -11,4 +11,4 @@ from models.study_session import StudySession, study_session_topics  # noqa
 # Cria todas as tabelas no banco de dados
 print("Creating database tables...")
 Base.metadata.create_all(bind=engine)
-print("Tables created successfully.")
+p<<<<<<< Updated upstreamrint("Tables created successfully.")

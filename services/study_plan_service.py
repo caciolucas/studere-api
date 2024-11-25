@@ -1,4 +1,5 @@
 import json
+from uuid import UUID
 from typing import List, Optional
 
 from fastapi import HTTPException
@@ -23,7 +24,7 @@ class StudyPlanService(BaseService):
         self,
         title: str,
         course_id: str,
-        current_user_id: str,
+        current_user_id: UUID,
         topics: List[StudyPlanTopicCreateUpdate],
     ) -> StudyPlan:
         course = self.course_service.retrieve_course(course_id, current_user_id)
@@ -42,7 +43,7 @@ class StudyPlanService(BaseService):
         self.repository.db.refresh(plan)
         return plan
 
-    def list_study_plans(self, user_id: str, course_id: Optional[str] = None):
+    def list_study_plans(self, user_id: UUID, course_id: Optional[str] = None):
         if course_id:
             self.course_service.retrieve_course(course_id, user_id)
         return self.repository.list_study_plans(user_id, course_id)
@@ -53,7 +54,7 @@ class StudyPlanService(BaseService):
             raise HTTPException(status_code=404)
         return study_topic
 
-    def retrieve_study_plan(self, study_plan_id: str, current_user_id: str):
+    def retrieve_study_plan(self, study_plan_id: str, current_user_id: UUID):
         study_plan = self.repository.retrieve_study_plan(study_plan_id)
         if not study_plan or study_plan.course.user_id != current_user_id:
             raise HTTPException(status_code=404, detail="StudyPlan not found")
@@ -62,7 +63,7 @@ class StudyPlanService(BaseService):
     def update_study_plan(
         self,
         study_plan_id: str,
-        current_user_id: str,
+        current_user_id: UUID,
         course_id: Optional[str] = None,
         title: Optional[str] = None,
         type: Optional[str] = None,
@@ -85,11 +86,13 @@ class StudyPlanService(BaseService):
             study_plan.score = score
         return self.repository.update_study_plan(study_plan)
 
-    def delete_study_plan(self, study_plan_id: str, current_user_id: str):
+    def delete_study_plan(self, study_plan_id: str, current_user_id: UUID):
         study_plan = self.retrieve_study_plan(study_plan_id, current_user_id)
         return self.repository.delete_study_plan(study_plan.id)
 
-    def ai_generate_study_plan(self, prompt: str, course_id: str, current_user_id: str):
+    def ai_generate_study_plan(
+        self, prompt: str, course_id: str, current_user_id: UUID
+    ):
         course = self.course_service.retrieve_course(course_id, current_user_id)
 
         response = self.openai_service.get_response(DEFAULT_PROMPT.format(prompt))
