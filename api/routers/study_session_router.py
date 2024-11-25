@@ -1,22 +1,24 @@
 import uuid
+from typing import List
 
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from typing import List
 
 from core.exceptions import (
-    RepositoryError,
     NotFoundError,
     PauseInactiveSessionError,
+    RepositoryError,
     SessionAlreadyPausedError,
-    SessionNotPausedError
+    SessionNotPausedError,
 )
-
 from core.security import get_current_user
 from db.session import get_db
 from models.user import User
-from schemas.study_session_schemas import StudySessionCreate, StudySessionUpdate, StudySessionResponse
-
+from schemas.study_session_schemas import (
+    StudySessionCreate,
+    StudySessionResponse,
+    StudySessionUpdate,
+)
 from services.study_session_service import StudySessionService
 
 router = APIRouter()

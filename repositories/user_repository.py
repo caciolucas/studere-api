@@ -1,4 +1,5 @@
 from uuid import UUID
+
 from core.repository import BaseRepository
 from models.user import User
 

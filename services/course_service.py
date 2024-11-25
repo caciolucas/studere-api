@@ -1,7 +1,7 @@
 from typing import Optional
+from uuid import UUID
 
 from fastapi import HTTPException
-from uuid import UUID
 from sqlalchemy.orm import Session
 
 from core.service import BaseService

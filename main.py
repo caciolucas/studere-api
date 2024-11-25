@@ -3,10 +3,10 @@ from fastapi import FastAPI
 from api.routers import (
     assignment_router,
     course_router,
-    studyplan_router,
-    user_router,
     study_session_router,
+    studyplan_router,
     term_router,
+    user_router,
 )
 
 app = FastAPI()

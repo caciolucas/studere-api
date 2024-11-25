@@ -1,10 +1,10 @@
-from uuid import UUID
 from datetime import datetime
-from typing import Optional, List
+from typing import List, Optional
+from uuid import UUID
 
 from pydantic import BaseModel
 
-from schemas.study_plan_schemas import StudyPlanTopicResponse, StudyPlanMinimalResponse
+from schemas.study_plan_schemas import StudyPlanMinimalResponse, StudyPlanTopicResponse
 
 
 class StudySessionBase(BaseModel):

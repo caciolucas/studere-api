@@ -1,5 +1,5 @@
-from typing import TYPE_CHECKING, List
 import uuid
+from typing import TYPE_CHECKING, List
 
 from sqlalchemy import ForeignKey, String, Text
 from sqlalchemy.dialects.postgresql import UUID

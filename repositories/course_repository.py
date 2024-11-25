@@ -1,7 +1,8 @@
-from core.repository import BaseRepository
-from models.course import Course
 from typing import Optional
 from uuid import UUID
+
+from core.repository import BaseRepository
+from models.course import Course
 from models.term import Term
 
 

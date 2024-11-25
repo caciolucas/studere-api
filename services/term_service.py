@@ -1,9 +1,11 @@
+from datetime import date
+from typing import Optional
 from uuid import UUID
+
 from fastapi import HTTPException
 from sqlalchemy.orm import Session
-from datetime import date
+
 from core.service import BaseService
-from typing import Optional
 from models.term import Term
 from repositories.term_repository import TermRepository
 from services.course_service import CourseService

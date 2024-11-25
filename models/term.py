@@ -1,14 +1,12 @@
 import uuid
-
-from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy.orm import relationship
 from datetime import date, datetime
 from typing import TYPE_CHECKING, List, Optional
 
-from sqlalchemy import DateTime, String, ForeignKey, Date, func
-from sqlalchemy.orm import mapped_column, Mapped
-from db.session import Base
+from sqlalchemy import Date, DateTime, ForeignKey, String, func
+from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
+from db.session import Base
 
 if TYPE_CHECKING:
     from models.course import Course

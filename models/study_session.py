@@ -1,13 +1,12 @@
 import uuid
 from enum import Enum as PyEnum
 
-from sqlalchemy import Column, DateTime, String, ForeignKey, Text, Float, Boolean, func
+from sqlalchemy import Boolean, Column, DateTime, Float, ForeignKey, String, Text, func
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 
-from models.study_plan import study_session_topics
-
 from db.session import Base
+from models.study_plan import study_session_topics
 
 
 class SessionState(PyEnum):

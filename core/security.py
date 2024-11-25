@@ -2,10 +2,11 @@ import uuid
 from datetime import datetime, timedelta
 
 import jwt
-from db.session import get_db
 from fastapi import Depends, Header, HTTPException, status
-from models.user import User
 from sqlalchemy.orm import Session
+
+from db.session import get_db
+from models.user import User
 
 SECRET_KEY = "APOS8DYF192U3H987VYASJDFN19382DGC"
 ALGORITHM = "HS256"

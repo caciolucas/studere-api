@@ -1,8 +1,9 @@
+from datetime import datetime
 from typing import Optional
+from uuid import UUID
 
 from fastapi import HTTPException
 from sqlalchemy.orm import Session
-from uuid import UUID
 
 from core.service import BaseService
 from models.assignment import Assignment
@@ -20,9 +21,9 @@ class AssignmentService(BaseService):
         title: str,
         type: str,
         description: Optional[str],
-        course_id: str,
+        course_id: UUID,
         current_user_id: UUID,
-        due_at: Optional[str],
+        due_at: datetime,
         score: Optional[int] = 0,
     ):
         course = self.course_service.retrieve_course(course_id, current_user_id)
@@ -36,12 +37,12 @@ class AssignmentService(BaseService):
         )
         return self.repository.create_assignment(new_assignment)
 
-    def list_assignments(self, user_id: UUID, course_id: Optional[str] = None):
+    def list_assignments(self, user_id: UUID, course_id: Optional[UUID] = None):
         if course_id:
             self.course_service.retrieve_course(course_id, user_id)
         return self.repository.list_assignments(user_id, course_id)
 
-    def retrieve_assignment(self, assignment_id: str, current_user_id: UUID):
+    def retrieve_assignment(self, assignment_id: UUID, current_user_id: UUID):
         assignment = self.repository.retrieve_assignment(assignment_id)
         if not assignment or assignment.course.user_id != current_user_id:
             raise HTTPException(status_code=404, detail="Assignment not found")
@@ -51,7 +52,7 @@ class AssignmentService(BaseService):
         self,
         assignment_id: str,
         current_user_id: UUID,
-        course_id: Optional[str] = None,
+        course_id: Optional[UUID] = None,
         title: Optional[str] = None,
         type: Optional[str] = None,
         description: Optional[str] = None,
@@ -73,6 +74,6 @@ class AssignmentService(BaseService):
             assignment.score = score
         return self.repository.update_assignment(assignment)
 
-    def delete_assignment(self, assignment_id: str, current_user_id: UUID):
+    def delete_assignment(self, assignment_id: UUID, current_user_id: UUID):
         assignment = self.retrieve_assignment(assignment_id, current_user_id)
         return self.repository.delete_assignment(assignment.id)

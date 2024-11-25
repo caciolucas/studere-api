@@ -1,6 +1,7 @@
+from uuid import UUID
+
 import bcrypt
 from fastapi import HTTPException
-from uuid import UUID
 from sqlalchemy.orm import Session
 
 from core.security import create_access_token

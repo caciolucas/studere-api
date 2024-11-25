@@ -1,6 +1,6 @@
 from datetime import datetime
-from uuid import UUID
 from typing import List, Optional
+from uuid import UUID
 
 from sqlalchemy.orm import Session
 
@@ -10,7 +10,6 @@ from core.exceptions import (
     SessionAlreadyPausedError,
     SessionNotPausedError,
 )
-
 from core.service import BaseService
 from models.study_session import StudySession
 from repositories.study_session_repository import StudySessionRepository

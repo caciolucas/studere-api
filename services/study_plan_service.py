@@ -1,6 +1,6 @@
 import json
-from uuid import UUID
 from typing import List, Optional
+from uuid import UUID
 
 from fastapi import HTTPException
 from sqlalchemy.orm import Session

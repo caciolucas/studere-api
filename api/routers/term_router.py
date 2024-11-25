@@ -1,11 +1,12 @@
+from uuid import UUID
+
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
-from uuid import UUID
 
 from core.security import get_current_user
 from db.session import get_db
 from models.user import User
-from schemas.term_schemas import TermResponse, TermCreateUpdate
+from schemas.term_schemas import TermCreateUpdate, TermResponse
 from services.term_service import TermService
 
 router = APIRouter()

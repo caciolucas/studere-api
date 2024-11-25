@@ -1,13 +1,12 @@
-from typing import List
 from datetime import datetime
+from typing import List
 from uuid import UUID
 
 from core.exceptions import RepositoryError
-
 from core.repository import BaseRepository
-from models.study_session import StudySession
-from models.study_plan import StudyPlan
 from models.course import Course
+from models.study_plan import StudyPlan
+from models.study_session import StudySession
 
 
 class StudySessionRepository(BaseRepository):

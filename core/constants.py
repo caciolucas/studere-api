@@ -1,6 +1,5 @@
 from decouple import config
 
-
 DEFAULT_PROMPT = """
 Baseada na descrição informada, retorne um json no formato abaixo que representará um plano de estudo para os assuntos definidos na descrição:
 [{{

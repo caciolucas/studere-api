@@ -1,6 +1,7 @@
+from uuid import UUID
+
 from core.repository import BaseRepository
 from models.term import Term
-from uuid import UUID
 
 
 class TermRepository(BaseRepository):
