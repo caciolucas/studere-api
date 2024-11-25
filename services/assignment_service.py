@@ -6,7 +6,7 @@ from fastapi import HTTPException
 from sqlalchemy.orm import Session
 
 from core.service import BaseService
-from models.assignment import Assignment
+from models.assignment import Assignment, AssignmentType
 from repositories.assignment_repository import AssignmentRepository
 from services.course_service import CourseService
 
@@ -19,7 +19,7 @@ class AssignmentService(BaseService):
     def create_assignment(
         self,
         title: str,
-        type: str,
+        type: AssignmentType,
         description: Optional[str],
         course_id: UUID,
         current_user_id: UUID,
@@ -29,7 +29,7 @@ class AssignmentService(BaseService):
         course = self.course_service.retrieve_course(course_id, current_user_id)
         new_assignment = Assignment(
             title=title,
-            type=type,
+            type=type.value,
             description=description,
             course=course,
             due_at=due_at,
@@ -50,13 +50,13 @@ class AssignmentService(BaseService):
 
     def update_assignment(
         self,
-        assignment_id: str,
+        assignment_id: UUID,
         current_user_id: UUID,
         course_id: Optional[UUID] = None,
         title: Optional[str] = None,
-        type: Optional[str] = None,
+        type: Optional[AssignmentType] = None,
         description: Optional[str] = None,
-        due_at: Optional[str] = None,
+        due_at: Optional[datetime] = None,
         score: Optional[int] = None,
     ):
         assignment = self.retrieve_assignment(assignment_id, current_user_id)

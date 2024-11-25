@@ -1,7 +1,6 @@
 from core.repository import BaseRepository
-from core.singleton import SingletonMeta
 
 
-class BaseService(metaclass=SingletonMeta):
+class BaseService:
     def __init__(self, repository: BaseRepository):
         self.repository = repository

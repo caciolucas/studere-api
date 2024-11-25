@@ -1,8 +1,10 @@
 from typing import List, Optional
 
+from uuid import UUID
 from core.repository import BaseRepository
 from models.course import Course
 from models.study_plan import StudyPlan, StudyPlanTopic
+from models.term import Term
 
 
 class StudyPlanRepository(BaseRepository):
@@ -12,11 +14,15 @@ class StudyPlanRepository(BaseRepository):
         self.db.refresh(study_plan)
         return study_plan
 
-    def retrieve_study_plan(self, study_plan_id: str) -> StudyPlan:
+    def retrieve_study_plan(self, study_plan_id: UUID) -> StudyPlan:
         return self.db.query(StudyPlan).filter(StudyPlan.id == study_plan_id).first()
 
     def retrieve_study_topic(self, study_topic_id: str) -> StudyPlanTopic:
-        return self.db.query(StudyPlanTopic).filter(StudyPlanTopic.id == study_topic_id).first()
+        return (
+            self.db.query(StudyPlanTopic)
+            .filter(StudyPlanTopic.id == study_topic_id)
+            .first()
+        )
 
     def update_study_plan(self, study_plan: StudyPlan) -> StudyPlan:
         self.db.merge(study_plan)
@@ -24,7 +30,7 @@ class StudyPlanRepository(BaseRepository):
         self.db.refresh(study_plan)
         return study_plan
 
-    def delete_study_plan(self, study_plan_id: str) -> None:
+    def delete_study_plan(self, study_plan_id: UUID) -> None:
         study_plan = (
             self.db.query(StudyPlan).filter(StudyPlan.id == study_plan_id).first()
         )
@@ -33,7 +39,7 @@ class StudyPlanRepository(BaseRepository):
             self.db.commit()
 
     def list_study_plans(
-        self, user_id: Optional[str] = None, course_id: Optional[str] = None
+        self, user_id: Optional[UUID] = None, course_id: Optional[UUID] = None
     ) -> list[StudyPlan]:
         if course_id:
             return (
@@ -44,7 +50,8 @@ class StudyPlanRepository(BaseRepository):
             return (
                 self.db.query(StudyPlan)
                 .join(Course)
-                .filter(Course.user_id == user_id)
+                .join(Term)
+                .filter(Term.user_id == user_id)
                 .all()
             )
 

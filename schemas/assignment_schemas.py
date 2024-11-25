@@ -4,11 +4,13 @@ from typing import Optional
 
 from pydantic import BaseModel
 
+from models.assignment import AssignmentType
+
 
 class AssignmentCreateUpdate(BaseModel):
     course_id: uuid.UUID
     title: str
-    type: str
+    type: AssignmentType
     description: Optional[str] = None
     score: Optional[int] = 0
     due_at: datetime
@@ -28,7 +30,7 @@ class AssignmentCreateUpdate(BaseModel):
 
 class AssignmentPartialUpdate(BaseModel):
     title: Optional[str] = None
-    type: Optional[str] = None
+    type: Optional[AssignmentType] = None
     description: Optional[str] = None
     score: Optional[int] = None
     due_at: Optional[datetime] = None
@@ -51,7 +53,7 @@ class AssignmentResponse(BaseModel):
     id: uuid.UUID
     course_id: uuid.UUID
     title: str
-    type: str
+    type: AssignmentType
     description: Optional[str] = None
     score: Optional[int] = None
     due_at: datetime

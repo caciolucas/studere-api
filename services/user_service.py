@@ -1,3 +1,4 @@
+from datetime import timezone, datetime
 from uuid import UUID
 
 import bcrypt
@@ -38,7 +39,9 @@ class UserService(BaseService):
         if not self.compare_passwords(password, user.password):
             raise HTTPException(status_code=401, detail="Senha incorreta")
 
-        token = create_access_token(data={"sub": str(user.id)})
+        token = create_access_token(
+            data={"sub": str(user.id), "iat": datetime.now(timezone.utc)}
+        )
 
         return {"access_token": token, "token_type": "bearer"}
 

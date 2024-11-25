@@ -1,4 +1,5 @@
-import uuid
+from typing import Optional
+from uuid import UUID
 from datetime import datetime, timedelta
 
 import jwt
@@ -13,7 +14,7 @@ ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
 
-def create_access_token(data: dict, expires_delta: timedelta = None):
+def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
     to_encode = data.copy()
     if expires_delta:
         expire = datetime.utcnow() + expires_delta
@@ -46,10 +47,12 @@ def verify_token_and_get_user_id(token: str):
     except jwt.InvalidTokenError:
         raise credentials_exception
 
-    return uuid.UUID(user_id)
+    return user_id
 
 
-def get_current_user(db: Session = Depends(get_db), authorization: str = Header(None)):
+def get_current_user(
+    db: Session = Depends(get_db), authorization: Optional[str] = Header(None)
+):
     if authorization is None:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,

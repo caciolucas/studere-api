@@ -45,7 +45,7 @@ def list_assignments(
 
 @router.get("/{assignment_id}", response_model=AssignmentResponse)
 def get_assignment(
-    assignment_id: str,
+    assignment_id: UUID,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
@@ -56,7 +56,7 @@ def get_assignment(
 
 @router.put("/{assignment_id}", response_model=AssignmentResponse)
 def update_assignment(
-    assignment_id: str,
+    assignment_id: UUID,
     body: AssignmentCreateUpdate,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
@@ -77,7 +77,7 @@ def update_assignment(
 
 @router.patch("/{assignment_id}", response_model=AssignmentResponse)
 def partial_update_assignment(
-    assignment_id: str,
+    assignment_id: UUID,
     body: AssignmentPartialUpdate,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
@@ -98,7 +98,7 @@ def partial_update_assignment(
 
 @router.delete("/{assignment_id}", status_code=204)
 def delete_assignment(
-    assignment_id: str,
+    assignment_id: UUID,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
