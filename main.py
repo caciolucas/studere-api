@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
 from api.routers import (
     assignment_router,
@@ -10,6 +11,13 @@ from api.routers import (
 )
 
 app = FastAPI()
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000"],  # Next.js frontend URL
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 app.include_router(user_router.router, prefix="/users", tags=["Users"])
 app.include_router(studyplan_router.router, prefix="/study-plans", tags=["Study Plans"])
