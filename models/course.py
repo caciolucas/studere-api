@@ -14,8 +14,8 @@ class Course(Base):
     name = Column(String, nullable=False)
     description = Column(Text)
 
-    user_id = Column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"))
-    user = relationship("User", back_populates="courses")
+    term_id = Column(UUID(as_uuid=True), ForeignKey("terms.id", ondelete="CASCADE"))
+    term = relationship("Term", back_populates="courses")
 
     assignments = relationship(
         "Assignment", back_populates="course", cascade="all, delete-orphan"

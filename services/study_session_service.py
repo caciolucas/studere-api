@@ -8,7 +8,7 @@ from core.exceptions import (
     NotFoundError,
     PauseInactiveSessionError,
     SessionAlreadyPausedError,
-    SessionNotPausedError
+    SessionNotPausedError,
 )
 
 from core.service import BaseService
@@ -31,7 +31,7 @@ class StudySessionService(BaseService):
         notes: Optional[str] = None,
         started_at: Optional[datetime] = datetime.now(),
         ended_at: Optional[datetime] = None,
-        total_pause_time: Optional[float] = 0.0
+        total_pause_time: Optional[float] = 0.0,
     ) -> StudySession:
         if ended_at and started_at > ended_at:
             raise ValueError("The start time cannot be greater than the end time.")
@@ -43,13 +43,12 @@ class StudySessionService(BaseService):
             notes=notes,
             started_at=started_at,
             ended_at=ended_at,
-            total_pause_time=total_pause_time
+            total_pause_time=total_pause_time,
         )
 
         retrieved_topics = [
             self.study_plan_service.retrieve_study_topic(topic_id)
-            for topic_id
-            in topics
+            for topic_id in topics
         ]
         new_study_session.topics = retrieved_topics
 
@@ -65,9 +64,13 @@ class StudySessionService(BaseService):
         study_session = self.get_study_session(study_session_id)
 
         if not study_session.is_active:
-            raise PauseInactiveSessionError("The session you're trying to pause is not active.")
+            raise PauseInactiveSessionError(
+                "The session you're trying to pause is not active."
+            )
         if study_session.is_paused:
-            raise SessionAlreadyPausedError("The session you're trying to pause is already paused.")
+            raise SessionAlreadyPausedError(
+                "The session you're trying to pause is already paused."
+            )
 
         return self.repository.pause_study_session(study_session_id, datetime.now())
 
@@ -75,9 +78,13 @@ class StudySessionService(BaseService):
         study_session = self.get_study_session(study_session_id)
 
         if not study_session.is_active:
-            raise PauseInactiveSessionError("The session you're trying to pause is not active.")
+            raise PauseInactiveSessionError(
+                "The session you're trying to pause is not active."
+            )
         if not study_session.is_paused:
-            raise SessionNotPausedError("The session you're trying to unpause is not paused.")
+            raise SessionNotPausedError(
+                "The session you're trying to unpause is not paused."
+            )
 
         elapsed_time = (
             (datetime.now() - study_session.last_pause_time).total_seconds()
@@ -99,18 +106,21 @@ class StudySessionService(BaseService):
         topics: Optional[List[UUID]] = None,
         started_at: Optional[datetime] = None,
         ended_at: Optional[datetime] = None,
-        total_pause_time: Optional[float] = None
+        total_pause_time: Optional[float] = None,
     ) -> StudySession:
         if started_at and ended_at and started_at > ended_at:
             raise ValueError("The start time cannot be greater than the end time.")
 
         study_session = self.get_study_session(study_session_id)
 
-        topics = [
-            self.study_plan_service.retrieve_study_topic(topic_id)
-            for topic_id
-            in topics
-        ] if topics else None
+        topics = (
+            [
+                self.study_plan_service.retrieve_study_topic(topic_id)
+                for topic_id in topics
+            ]
+            if topics
+            else None
+        )
 
         (
             lambda fields: [
@@ -120,8 +130,7 @@ class StudySessionService(BaseService):
             {
                 field: value
                 for field, value in locals().items()
-                if
-                field not in {"self", "study_session_id", "study_session"}
+                if field not in {"self", "study_session_id", "study_session"}
                 and value is not None
             }
         )
