@@ -61,6 +61,11 @@ class StudyPlanResponse(BaseModel):
         from_attibutes = True
 
 
+class StudyPlanMinimalResponse(BaseModel):
+    id: uuid.UUID
+    title: str
+
+
 class StudyPlanAIGenerate(BaseModel):
     prompt: str
     course_id: uuid.UUID
