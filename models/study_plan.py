@@ -40,7 +40,7 @@ class StudyPlan(Base):
     sessions: Mapped[List["StudySession"]] = relationship(
         "StudySession", back_populates="plan", cascade="all, delete-orphan"
     )
-    created_at: Mapped[datetime]
+    created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
 
 
 class StudyPlanTopic(Base):
