@@ -52,7 +52,7 @@ def update_course(
     current_user: User = Depends(get_current_user),
 ):
     course_service = CourseService(db)
-    course = course_service.update_course(course_id, body.name, current_user.id)
+    course = course_service.update_course(course_id, current_user.id, body.name)
     return course
 
 

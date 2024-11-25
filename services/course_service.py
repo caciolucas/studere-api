@@ -25,7 +25,7 @@ class CourseService(BaseService):
 
     def retrieve_course(self, course_id: UUID, current_user_id: UUID):
         course = self.repository.retrieve_course(course_id)
-        if not course or course.user_id != current_user_id:
+        if not course or course.term.user_id != current_user_id:
             raise HTTPException(status_code=404, detail="Course not found")
 
         return course
