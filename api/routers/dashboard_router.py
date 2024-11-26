@@ -51,12 +51,19 @@ def get_streaks(
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-@router.get("/time-distribution", response_model=Dict[str, List[ Dict[str, float] ]])
+
+@router.get("/time-distribution")
 def get_time_distribution(
     db: Session = Depends(get_db),
     curr_user: User = Depends(get_current_user),
 ):
-    distribution_service = StudySessionService(db)
-
-    data = distribution_service.get_time_distribution(curr_user)
-    return {"data": data}
+    try:
+        dashboard_service = DashboardService(db)
+        data = dashboard_service.get_time_distribution(curr_user.id)
+        return {"data": data}
+    except NotFoundError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+    except RepositoryError as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
