@@ -8,6 +8,7 @@ from api.routers import (
     study_session_router,
     term_router,
     user_router,
+    dashboard_router
 )
 
 app = FastAPI()
@@ -33,3 +34,4 @@ app.include_router(
 app.include_router(course_router.router, prefix="/courses", tags=["Courses"])
 app.include_router(study_session_router.router, prefix="/sessions", tags=["Sessions"])
 app.include_router(term_router.router, prefix="/terms", tags=["Terms"])
+app.include_router(dashboard_router.router, prefix="/dashboard", tags=["Dashboard"])
