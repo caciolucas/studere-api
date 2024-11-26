@@ -34,9 +34,9 @@ class StudySessionCreate(StudySessionBase):
                     {
                         "id": "550e8400-e29b-41d4-a716-446655441111",
                         "title": "Geometry Fundamentals",
-                        "created_at": "2024-11-20T09:00:00Z"
+                        "created_at": "2024-11-20T09:00:00Z",
                     }
-                ]
+                ],
             }
         }
 
@@ -45,9 +45,7 @@ class StudySessionUpdate(StudySessionBase):
     title: Optional[str] = None
 
     class Config:
-        fields = {
-            "is_active": {"exclude": True}
-        }
+        fields = {"is_active": {"exclude": True}}
 
 
 class StudySessionResponse(StudySessionBase):

@@ -7,6 +7,7 @@ from sqlalchemy.orm import Session
 from core.exceptions import (
     NotFoundError,
     PauseInactiveSessionError,
+    SessionAlreadyFinishedError,
     SessionAlreadyPausedError,
     SessionNotPausedError,
 )
@@ -25,7 +26,7 @@ class StudySessionService(BaseService):
         self,
         title: str,
         plan_id: UUID,
-        topics: Optional[List[UUID]],
+        topics: Optional[List[UUID]] = [],
         description: Optional[str] = None,
         notes: Optional[str] = None,
         started_at: Optional[datetime] = datetime.now(),
@@ -45,22 +46,35 @@ class StudySessionService(BaseService):
             total_pause_time=total_pause_time,
         )
 
-        retrieved_topics = [
-            self.study_plan_service.retrieve_study_topic(topic_id)
-            for topic_id in topics
-        ]
-        new_study_session.topics = retrieved_topics
+        if topics:
+            retrieved_topics = [
+                self.study_plan_service.retrieve_study_topic(topic_id)
+                for topic_id in topics
+            ]
+            new_study_session.topics = retrieved_topics
 
         return self.repository.create_study_session(new_study_session)
 
-    def get_study_session(self, study_session_id: str):
+    def retrieve_study_session(self, study_session_id: str):
         study_session = self.repository.retrieve_study_session(study_session_id)
         if study_session is None:
             raise NotFoundError(f"Study session not found: {study_session_id}")
         return study_session
 
+    def end_study_session(self, study_session_id: str):
+        study_session = self.retrieve_study_session(study_session_id)
+
+        if not study_session.is_active:
+            raise SessionAlreadyFinishedError(
+                "The session you're trying to end is not active."
+            )
+        if study_session.is_paused:
+            self.unpause_study_session(study_session_id)
+
+        return self.repository.end_study_session(study_session_id, datetime.now())
+
     def pause_study_session(self, study_session_id: str):
-        study_session = self.get_study_session(study_session_id)
+        study_session = self.retrieve_study_session(study_session_id)
 
         if not study_session.is_active:
             raise PauseInactiveSessionError(
@@ -74,7 +88,7 @@ class StudySessionService(BaseService):
         return self.repository.pause_study_session(study_session_id, datetime.now())
 
     def unpause_study_session(self, study_session_id: str):
-        study_session = self.get_study_session(study_session_id)
+        study_session = self.retrieve_study_session(study_session_id)
 
         if not study_session.is_active:
             raise PauseInactiveSessionError(
@@ -110,7 +124,7 @@ class StudySessionService(BaseService):
         if started_at and ended_at and started_at > ended_at:
             raise ValueError("The start time cannot be greater than the end time.")
 
-        study_session = self.get_study_session(study_session_id)
+        study_session = self.retrieve_study_session(study_session_id)
 
         topics = (
             [
@@ -138,5 +152,5 @@ class StudySessionService(BaseService):
 
     def delete_study_session(self, study_session_id: str):
         # try to get it first, so if it doesnt exist
-        self.get_study_session(study_session_id)
+        self.retrieve_study_session(study_session_id)
         self.repository.delete_study_session(study_session_id)

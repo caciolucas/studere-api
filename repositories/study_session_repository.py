@@ -7,6 +7,7 @@ from core.repository import BaseRepository
 from models.course import Course
 from models.study_plan import StudyPlan
 from models.study_session import StudySession
+from models.term import Term
 
 
 class StudySessionRepository(BaseRepository):
@@ -71,6 +72,26 @@ class StudySessionRepository(BaseRepository):
                 f"Operation failed due to internal database error: {e}"
             ) from e
 
+    def end_study_session(
+        self, study_session_id: str, pause_start: datetime
+    ) -> StudySession:
+        try:
+            study_session = (
+                self.db.query(StudySession)
+                .filter(StudySession.id == study_session_id)
+                .first()
+            )
+
+            study_session.is_active = False
+            study_session.ended_at = datetime.now()
+            self.db.commit()
+            self.db.refresh(study_session)
+            return study_session
+        except Exception as e:
+            raise RepositoryError(
+                f"Operation failed due to internal database error: {e}"
+            ) from e
+
     def pause_study_session(
         self, study_session_id: str, pause_start: datetime
     ) -> StudySession:
@@ -120,7 +141,8 @@ class StudySessionRepository(BaseRepository):
                 self.db.query(StudySession)
                 .join(StudyPlan, StudySession.plan_id == StudyPlan.id)
                 .join(Course, StudyPlan.course_id == Course.id)
-                .filter(Course.user_id == curr_user_id)
+                .join(Term, Course.term_id == Term.id)
+                .filter(Term.user_id == curr_user_id)
                 .all()
             )
         except Exception as e:

@@ -5,7 +5,7 @@ from api.routers import (
     assignment_router,
     course_router,
     study_session_router,
-    studyplan_router,
+    study_plan_router,
     term_router,
     user_router,
 )
@@ -14,14 +14,18 @@ app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],  # Next.js frontend URL
+    allow_origins=[
+        "http://localhost:3000",
+        "http://localhost:5173",
+        "http://d2a6-187-61-238-60.ngrok-free.app",
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
 app.include_router(user_router.router, prefix="/users", tags=["Users"])
-app.include_router(studyplan_router.router, prefix="/study-plans", tags=["Study Plans"])
+app.include_router(study_plan_router.router, prefix="/plans", tags=["Study Plans"])
 app.include_router(
     assignment_router.router, prefix="/assignments", tags=["Assignments"]
 )

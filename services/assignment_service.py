@@ -2,9 +2,9 @@ from datetime import datetime
 from typing import Optional
 from uuid import UUID
 
-from fastapi import HTTPException
 from sqlalchemy.orm import Session
 
+from core.exceptions import NotFoundError
 from core.service import BaseService
 from models.assignment import Assignment, AssignmentType
 from repositories.assignment_repository import AssignmentRepository
@@ -25,8 +25,9 @@ class AssignmentService(BaseService):
         current_user_id: UUID,
         due_at: datetime,
         score: Optional[int] = 0,
-    ):
+    ) -> Assignment:
         course = self.course_service.retrieve_course(course_id, current_user_id)
+
         new_assignment = Assignment(
             title=title,
             type=type.value,
@@ -45,7 +46,9 @@ class AssignmentService(BaseService):
     def retrieve_assignment(self, assignment_id: UUID, current_user_id: UUID):
         assignment = self.repository.retrieve_assignment(assignment_id)
         if not assignment or assignment.course.user_id != current_user_id:
-            raise HTTPException(status_code=404, detail="Assignment not found")
+            raise NotFoundError(
+                f"Assigment not found: {assignment_id} (user: {current_user_id})"
+            )
         return assignment
 
     def update_assignment(
@@ -60,6 +63,7 @@ class AssignmentService(BaseService):
         score: Optional[int] = None,
     ):
         assignment = self.retrieve_assignment(assignment_id, current_user_id)
+
         if course_id:
             assignment.course_id = course_id
         if title:
@@ -72,8 +76,9 @@ class AssignmentService(BaseService):
             assignment.due_at = due_at
         if score is not None:
             assignment.score = score
+
         return self.repository.update_assignment(assignment)
 
     def delete_assignment(self, assignment_id: UUID, current_user_id: UUID):
-        assignment = self.retrieve_assignment(assignment_id, current_user_id)
-        return self.repository.delete_assignment(assignment.id)
+        self.retrieve_assignment(assignment_id, current_user_id)
+        return self.repository.delete_assignment(assignment_id)

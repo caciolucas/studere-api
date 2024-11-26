@@ -2,8 +2,12 @@ import json
 from typing import List, Optional
 from uuid import UUID
 
-from fastapi import HTTPException
 from sqlalchemy.orm import Session
+
+from core.exceptions import (
+    NotFoundError,
+    OpenAIInvalidFormatError
+)
 
 from core.constants import DEFAULT_PROMPT, OPEN_AI_KEY
 from core.service import BaseService
@@ -51,13 +55,13 @@ class StudyPlanService(BaseService):
     def retrieve_study_topic(self, study_topic_id: str):
         study_topic = self.repository.retrieve_study_topic(study_topic_id)
         if not study_topic:
-            raise HTTPException(status_code=404)
+            raise NotFoundError(f"Study topic not found: {study_topic_id}")
         return study_topic
 
     def retrieve_study_plan(self, study_plan_id: UUID, current_user_id: UUID):
         study_plan = self.repository.retrieve_study_plan(study_plan_id)
         if not study_plan or study_plan.course.user_id != current_user_id:
-            raise HTTPException(status_code=404, detail="StudyPlan not found")
+            raise NotFoundError(f"Study plan not found: {study_plan_id} (user: {current_user_id})")
         return study_plan
 
     def update_study_plan(
@@ -72,6 +76,7 @@ class StudyPlanService(BaseService):
         score: Optional[int] = None,
     ):
         study_plan = self.retrieve_study_plan(study_plan_id, current_user_id)
+
         if course_id:
             study_plan.course_id = course_id
         if title:
@@ -84,24 +89,23 @@ class StudyPlanService(BaseService):
             study_plan.due_at = due_at
         if score is not None:
             study_plan.score = score
+
         return self.repository.update_study_plan(study_plan)
 
     def delete_study_plan(self, study_plan_id: UUID, current_user_id: UUID):
-        study_plan = self.retrieve_study_plan(study_plan_id, current_user_id)
-        return self.repository.delete_study_plan(study_plan.id)
+        self.retrieve_study_plan(study_plan_id, current_user_id)
+        return self.repository.delete_study_plan(study_plan_id)
 
     def ai_generate_study_plan(
         self, prompt: str, course_id: UUID, current_user_id: UUID
     ):
         course = self.course_service.retrieve_course(course_id, current_user_id)
-
         response = self.openai_service.get_response(DEFAULT_PROMPT.format(prompt))
+
         try:
             json_content = json.loads(response)
-        except json.JSONDecodeError:
-            raise Exception("Retorno da OpenAI em formato inválido")
         except Exception as e:
-            raise Exception(f"Erro ao decodificar JSON: {e}") from e
+            raise OpenAIInvalidFormatError(f"Invalid OpenAI response format: {e}") from e
 
         if isinstance(json_content, list):
             json_content = json_content[0]
