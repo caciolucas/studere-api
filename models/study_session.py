@@ -1,15 +1,20 @@
 import uuid
-from enum import Enum as PyEnum
+from datetime import datetime
+from enum import Enum
+from typing import TYPE_CHECKING, List
 
-from sqlalchemy import Boolean, Column, DateTime, Float, ForeignKey, String, Text, func
+from sqlalchemy import DateTime, Float, ForeignKey, String, Text, func
 from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from db.session import Base
 from models.study_plan import study_session_topics
 
+if TYPE_CHECKING:
+    from models.study_plan import StudyPlan, StudyPlanTopic
 
-class SessionState(PyEnum):
+
+class SessionState(Enum):
     ACTIVE = "active"
     PAUSED = "paused"
     COMPLETED = "completed"
@@ -18,25 +23,30 @@ class SessionState(PyEnum):
 class StudySession(Base):
     __tablename__ = "study_sessions"
 
-    id = Column(UUID(as_uuid=True), primary_key=True, index=True, default=uuid.uuid4)
-    title = Column(String, nullable=False)
-    description = Column(Text)
-    notes = Column(Text, nullable=True)
+    id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), primary_key=True, index=True, default=uuid.uuid4
+    )
+    title: Mapped[str] = mapped_column(String, nullable=False)
+    description: Mapped[str] = mapped_column(Text)
 
-    plan_id = Column(UUID(as_uuid=True), ForeignKey("study_plans.id"), nullable=False)
-    plan = relationship("StudyPlan", back_populates="sessions")
+    notes = mapped_column(Text, nullable=True)
 
-    topics = relationship(
+    plan_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("study_plans.id"), nullable=False
+    )
+    plan: Mapped["StudyPlan"] = relationship("StudyPlan", back_populates="sessions")
+
+    topics: Mapped[List["StudyPlanTopic"]] = relationship(
         "StudyPlanTopic", secondary=study_session_topics, back_populates="sessions"
     )
 
-    # State fields
-    is_active = Column(Boolean, default=True)
-    is_paused = Column(Boolean, default=False)
+    status: Mapped[SessionState] = mapped_column(
+        String, default=SessionState.ACTIVE.value
+    )
 
-    # Timing fields
-    started_at = Column(DateTime, server_default=func.now())
-    ended_at = Column(DateTime, nullable=True)
+    started_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
+    ended_at: Mapped[datetime] = mapped_column(DateTime, nullable=True)
 
-    last_pause_time = Column(DateTime, nullable=True)
-    total_pause_time = Column(Float, default=0.0)
+    last_pause_time: Mapped[datetime] = mapped_column(DateTime, nullable=True)
+    total_pause_time: Mapped[float] = mapped_column(Float, default=0.0)
+    study_time: Mapped[float] = mapped_column(Float, default=0.0)
