@@ -38,6 +38,7 @@ class DashboardRepository(BaseRepository):
     def get_study_sessions_last_7_days(self, curr_user_id: UUID) -> List[dict]:
         try:
             today = date.today()
+            tomorrow = date.today() + timedelta(days=1)
             seven_days_ago = today - timedelta(days=6)
 
             results = (
@@ -50,7 +51,7 @@ class DashboardRepository(BaseRepository):
                 .join(Term, Course.term_id == Term.id)
                 .filter(Term.user_id == curr_user_id)
                 .filter(StudySession.started_at >= seven_days_ago)
-                .filter(StudySession.started_at <= today)
+                .filter(StudySession.started_at < tomorrow)
                 .group_by(func.date(StudySession.started_at))
                 .order_by(func.date(StudySession.started_at))
                 .all()
