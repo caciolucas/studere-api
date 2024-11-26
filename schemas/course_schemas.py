@@ -12,7 +12,7 @@ class CourseCreateUpdate(BaseModel):
 class CourseResponse(BaseModel):
     id: UUID
     name: str
-    term_id: TermResponse
+    term: TermResponse
 
     class Config:
         from_attibutes = True

@@ -8,6 +8,7 @@ from core.exceptions import (
     NotFoundError,
     PauseInactiveSessionError,
     RepositoryError,
+    SessionAlreadyFinishedError,
     SessionAlreadyPausedError,
     SessionNotPausedError,
 )
@@ -28,7 +29,7 @@ router = APIRouter()
 def create_study_session(
     body: StudySessionCreate,
     db: Session = Depends(get_db),
-    curr_user: User = Depends(get_current_user)
+    curr_user: User = Depends(get_current_user),
 ):
     try:
         study_session_service = StudySessionService(db)
@@ -40,7 +41,7 @@ def create_study_session(
             notes=body.notes,
             started_at=body.started_at,
             ended_at=body.ended_at,
-            total_pause_time=body.total_pause_time
+            total_pause_time=body.total_pause_time,
         )
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
@@ -48,12 +49,33 @@ def create_study_session(
         raise HTTPException(status_code=500, detail=str(e))
 
 
+@router.post("/end/{study_session_id}", response_model=StudySessionResponse)
+def end_study_session(
+    study_session_id: uuid.UUID,
+    db: Session = Depends(get_db),
+    curr_user: User = Depends(get_current_user),
+):
+    try:
+        study_session_service = StudySessionService(db)
+        return study_session_service.end_study_session(study_session_id)
+    except NotFoundError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+    except RepositoryError as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    except (
+        PauseInactiveSessionError,
+        SessionAlreadyPausedError,
+        SessionAlreadyFinishedError,
+    ) as e:
+        raise HTTPException(status_code=409, detail=str(e))
+
+
 @router.put("/{study_session_id}", response_model=StudySessionResponse, status_code=201)
 def update_study_session(
     study_session_id: uuid.UUID,
     body: StudySessionUpdate,
     db: Session = Depends(get_db),
-    curr_user: User = Depends(get_current_user)
+    curr_user: User = Depends(get_current_user),
 ):
     try:
         study_session_service = StudySessionService(db)
@@ -65,7 +87,7 @@ def update_study_session(
             notes=body.notes,
             started_at=body.started_at,
             ended_at=body.ended_at,
-            total_pause_time=body.total_pause_time
+            total_pause_time=body.total_pause_time,
         )
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
@@ -75,9 +97,9 @@ def update_study_session(
 
 @router.get("/{study_session_id}", response_model=StudySessionResponse)
 def retrieve_study_session(
-        study_session_id: uuid.UUID,
-        db: Session = Depends(get_db),
-        curr_user: User = Depends(get_current_user)
+    study_session_id: uuid.UUID,
+    db: Session = Depends(get_db),
+    curr_user: User = Depends(get_current_user),
 ):
     try:
         study_session_service = StudySessionService(db)
@@ -92,7 +114,7 @@ def retrieve_study_session(
 def delete_study_session(
     study_session_id: str,
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user)
+    current_user: User = Depends(get_current_user),
 ):
     try:
         study_session_service = StudySessionService(db)
@@ -105,8 +127,7 @@ def delete_study_session(
 
 @router.get("/list_sessions/", response_model=List[StudySessionResponse])
 def list_study_sessions(
-        db: Session = Depends(get_db),
-        curr_user: User = Depends(get_current_user)
+    db: Session = Depends(get_db), curr_user: User = Depends(get_current_user)
 ):
     try:
         study_session_service = StudySessionService(db)
@@ -117,9 +138,9 @@ def list_study_sessions(
 
 @router.post("/pause/{study_session_id}", response_model=StudySessionResponse)
 def pause_study_session(
-        study_session_id: uuid.UUID,
-        db: Session = Depends(get_db),
-        curr_user: User = Depends(get_current_user)
+    study_session_id: uuid.UUID,
+    db: Session = Depends(get_db),
+    curr_user: User = Depends(get_current_user),
 ):
     try:
         study_session_service = StudySessionService(db)
@@ -134,9 +155,9 @@ def pause_study_session(
 
 @router.post("/unpause/{study_session_id}", response_model=StudySessionResponse)
 def unpause_study_session(
-        study_session_id: uuid.UUID,
-        db: Session = Depends(get_db),
-        curr_user: User = Depends(get_current_user)
+    study_session_id: uuid.UUID,
+    db: Session = Depends(get_db),
+    curr_user: User = Depends(get_current_user),
 ):
     try:
         study_session_service = StudySessionService(db)

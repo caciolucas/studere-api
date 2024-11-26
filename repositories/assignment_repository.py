@@ -1,10 +1,11 @@
-from typing import Optional
+from typing import List, Optional
 from uuid import UUID
 
 from core.exceptions import RepositoryError
 from core.repository import BaseRepository
 from models.assignment import Assignment
 from models.course import Course
+from models.term import Term
 
 
 class AssignmentRepository(BaseRepository):
@@ -21,7 +22,9 @@ class AssignmentRepository(BaseRepository):
 
     def retrieve_assignment(self, assignment_id: UUID) -> Assignment:
         try:
-            return self.db.query(Assignment).filter(Assignment.id == assignment_id).first()
+            return (
+                self.db.query(Assignment).filter(Assignment.id == assignment_id).first()
+            )
         except Exception as e:
             raise RepositoryError(
                 f"Operation failed due to internal database error: {e}"
@@ -53,7 +56,7 @@ class AssignmentRepository(BaseRepository):
 
     def list_assignments(
         self, user_id: Optional[UUID] = None, course_id: Optional[UUID] = None
-    ) -> list[Assignment]:
+    ) -> List[Assignment]:
         try:
             if course_id:
                 return (
@@ -66,7 +69,8 @@ class AssignmentRepository(BaseRepository):
                 return (
                     self.db.query(Assignment)
                     .join(Course)
-                    .filter(Course.user_id == user_id)
+                    .join(Term)
+                    .filter(Term.user_id == user_id)
                     .all()
                 )
 

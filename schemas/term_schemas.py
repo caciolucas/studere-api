@@ -1,5 +1,5 @@
 import uuid
-from datetime import date
+from datetime import date, datetime
 
 from pydantic import BaseModel
 
@@ -17,6 +17,7 @@ class TermResponse(BaseModel):
 
     start_date: date
     end_date: date
+    created_at: datetime
 
     class Config:
         from_attibutes = True
