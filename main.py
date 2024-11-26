@@ -5,7 +5,7 @@ from api.routers import (
     assignment_router,
     course_router,
     study_session_router,
-    studyplan_router,
+    study_plan_router,
     term_router,
     user_router,
 )
@@ -21,7 +21,7 @@ app.add_middleware(
 )
 
 app.include_router(user_router.router, prefix="/users", tags=["Users"])
-app.include_router(studyplan_router.router, prefix="/study-plans", tags=["Study Plans"])
+app.include_router(study_plan_router.router, prefix="/plans", tags=["Study Plans"])
 app.include_router(
     assignment_router.router, prefix="/assignments", tags=["Assignments"]
 )

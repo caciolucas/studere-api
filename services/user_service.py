@@ -2,9 +2,9 @@ from datetime import timezone, datetime
 from uuid import UUID
 
 import bcrypt
-from fastapi import HTTPException
 from sqlalchemy.orm import Session
 
+from core.exceptions import NotFoundError, ValidationError
 from core.security import create_access_token
 from core.service import BaseService
 from models.user import User
@@ -23,31 +23,40 @@ class UserService(BaseService):
 
     def register_user(self, email: str, password: str, full_name: str) -> User:
         user = self.repository.get_user_by_email(email)
+
         if user:
-            raise HTTPException(status_code=400, detail="Email já cadastrado")
+            raise ValueError(
+                f"This email is already in use: {email}."
+            )
+
         hashed_password = self.generate_hashed_password(password)
         new_user = User(email=email, password=hashed_password, full_name=full_name)
-        self.repository.create_user(new_user)
-
-        return new_user
+        return self.repository.create_user(new_user)
 
     def login(self, email: str, password: str):
         user = self.repository.get_user_by_email(email)
+
         if not user:
-            raise HTTPException(status_code=404, detail="Usuário não encontrado")
+            raise NotFoundError(f"User not found: {email}")
 
         if not self.compare_passwords(password, user.password):
-            raise HTTPException(status_code=401, detail="Senha incorreta")
+            raise ValidationError("Incorrect password! Please try again.")
 
         token = create_access_token(
             data={"sub": str(user.id), "iat": datetime.now(timezone.utc)}
         )
 
-        return {"access_token": token, "token_type": "bearer"}
+        return {
+            "id": user.id,
+            "email": user.email,
+            "full_name": user.full_name,
+            "created_at": user.created_at,
+            "access_token": token,
+            "token_type": "bearer"
+        }
 
     def retrieve_user(self, user_id: UUID) -> User:
         user = self.repository.get_user_by_id(user_id)
         if not user:
-            raise HTTPException(status_code=404, detail="Usuário não encontrado")
-
+            raise NotFoundError(f"User not found: {user_id}")
         return user

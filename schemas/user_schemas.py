@@ -1,3 +1,4 @@
+from uuid import UUID
 from datetime import date
 
 from pydantic import BaseModel, EmailStr
@@ -15,7 +16,7 @@ class UserLogin(BaseModel):
 
 
 class UserResponse(BaseModel):
-    id: str
+    id: UUID
     email: EmailStr
     full_name: str
     created_at: date
@@ -23,3 +24,8 @@ class UserResponse(BaseModel):
     class Config:
         # This allows automatic conversion from a SQLAlchemy model to Pydantic
         from_attibutes = True
+
+
+class UserLoginResponse(UserLogin):
+    access_token: str
+    token_type: str

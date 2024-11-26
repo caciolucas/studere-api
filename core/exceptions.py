@@ -13,10 +13,6 @@ class RepositoryError(StudereError):
     pass
 
 
-class DatabaseError(RepositoryError):
-    """General database issues."""
-    pass
-
 # --- Service Errors ---
 
 
@@ -31,6 +27,14 @@ class NotFoundError(ServiceError):
 
 class ValidationError(ServiceError):
     """Raised when input data fails validation."""
+    pass
+
+
+class OpenAIAPIError(ServiceError):
+    pass
+
+
+class OpenAIInvalidFormatError(ServiceError):
     pass
 
 

@@ -53,14 +53,14 @@ class StudySessionService(BaseService):
 
         return self.repository.create_study_session(new_study_session)
 
-    def get_study_session(self, study_session_id: str):
+    def retrieve_study_session(self, study_session_id: str):
         study_session = self.repository.retrieve_study_session(study_session_id)
         if study_session is None:
             raise NotFoundError(f"Study session not found: {study_session_id}")
         return study_session
 
     def pause_study_session(self, study_session_id: str):
-        study_session = self.get_study_session(study_session_id)
+        study_session = self.retrieve_study_session(study_session_id)
 
         if not study_session.is_active:
             raise PauseInactiveSessionError(
@@ -74,7 +74,7 @@ class StudySessionService(BaseService):
         return self.repository.pause_study_session(study_session_id, datetime.now())
 
     def unpause_study_session(self, study_session_id: str):
-        study_session = self.get_study_session(study_session_id)
+        study_session = self.retrieve_study_session(study_session_id)
 
         if not study_session.is_active:
             raise PauseInactiveSessionError(
@@ -110,7 +110,7 @@ class StudySessionService(BaseService):
         if started_at and ended_at and started_at > ended_at:
             raise ValueError("The start time cannot be greater than the end time.")
 
-        study_session = self.get_study_session(study_session_id)
+        study_session = self.retrieve_study_session(study_session_id)
 
         topics = (
             [
@@ -138,5 +138,5 @@ class StudySessionService(BaseService):
 
     def delete_study_session(self, study_session_id: str):
         # try to get it first, so if it doesnt exist
-        self.get_study_session(study_session_id)
+        self.retrieve_study_session(study_session_id)
         self.repository.delete_study_session(study_session_id)

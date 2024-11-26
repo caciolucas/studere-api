@@ -1,5 +1,7 @@
 import openai
 
+from core.exceptions import OpenAIAPIError
+
 
 class OpenAIService:
     def __init__(
@@ -55,5 +57,6 @@ class OpenAIService:
             response = self.client.chat.completions.create(**payload)
             return response.choices[0].message.content.strip()
         except Exception as e:
-            print(f"Erro ao conectar-se à API OpenAI: {e}")
-            return "Erro ao processar a solicitação."
+            raise OpenAIAPIError(
+                f"OpenAI API error: {e}"
+            )

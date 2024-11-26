@@ -74,14 +74,14 @@ def update_study_session(
 
 
 @router.get("/{study_session_id}", response_model=StudySessionResponse)
-def get_study_session(
+def retrieve_study_session(
         study_session_id: uuid.UUID,
         db: Session = Depends(get_db),
         curr_user: User = Depends(get_current_user)
 ):
     try:
         study_session_service = StudySessionService(db)
-        return study_session_service.get_study_session(study_session_id)
+        return study_session_service.retrieve_study_session(study_session_id)
     except NotFoundError as e:
         raise HTTPException(status_code=404, detail=str(e))
     except RepositoryError as e:
@@ -111,8 +111,6 @@ def list_study_sessions(
     try:
         study_session_service = StudySessionService(db)
         return study_session_service.list_study_sessions(curr_user.id)
-    except NotFoundError as e:
-        raise HTTPException(status_code=404, detail=str(e))
     except RepositoryError as e:
         raise HTTPException(status_code=500, detail=str(e))
 
