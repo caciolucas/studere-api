@@ -50,3 +50,13 @@ def get_streaks(
         raise HTTPException(status_code=500, detail=str(e))
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+@router.get("/time-distribution", response_model=Dict[str, List[ Dict[str, float] ]])
+def get_time_distribution(
+    db: Session = Depends(get_db),
+    curr_user: User = Depends(get_current_user),
+):
+    distribution_service = StudySessionService(db)
+
+    data = distribution_service.get_time_distribution(curr_user)
+    return {"data": data}
