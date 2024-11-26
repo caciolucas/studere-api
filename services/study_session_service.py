@@ -22,46 +22,27 @@ class StudySessionService(BaseService):
         self.repository = StudySessionRepository(db)
         self.study_plan_service = StudyPlanService(db)
 
-    def create_study_session(
+    def start_study_session(
         self,
         title: str,
         plan_id: UUID,
-        topics: Optional[List[UUID]] = [],
         description: Optional[str] = None,
-        notes: Optional[str] = None,
-        started_at: Optional[datetime] = datetime.now(),
-        ended_at: Optional[datetime] = None,
-        total_pause_time: Optional[float] = 0.0,
     ) -> StudySession:
-        if ended_at and started_at > ended_at:
-            raise ValueError("The start time cannot be greater than the end time.")
-
         new_study_session = StudySession(
             title=title,
             plan_id=plan_id,
             description=description,
-            notes=notes,
-            started_at=started_at,
-            ended_at=ended_at,
-            total_pause_time=total_pause_time,
         )
-
-        if topics:
-            retrieved_topics = [
-                self.study_plan_service.retrieve_study_topic(topic_id)
-                for topic_id in topics
-            ]
-            new_study_session.topics = retrieved_topics
 
         return self.repository.create_study_session(new_study_session)
 
-    def retrieve_study_session(self, study_session_id: str):
+    def retrieve_current_study_session(self, study_session_id: str):
         study_session = self.repository.retrieve_study_session(study_session_id)
         if study_session is None:
             raise NotFoundError(f"Study session not found: {study_session_id}")
         return study_session
 
-    def end_study_session(self, study_session_id: str):
+    def end_study_session(self, study_session_id: UUID):
         study_session = self.retrieve_study_session(study_session_id)
 
         if not study_session.is_active:

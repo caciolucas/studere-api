@@ -17,7 +17,9 @@ class StudySessionRepository(BaseRepository):
             self.db.add(study_session)
             self.db.commit()
             self.db.refresh(study_session)
+
             return study_session
+
         except Exception as e:
             raise RepositoryError(
                 f"Operation failed due to internal database error: {e}"

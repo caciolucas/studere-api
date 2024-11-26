@@ -26,23 +26,17 @@ from services.study_session_service import StudySessionService
 router = APIRouter()
 
 
-@router.post("/", response_model=StudySessionResponse, status_code=201)
+@router.post("/start", response_model=StudySessionResponse, status_code=201)
 def create_study_session(
     body: StudySessionCreate,
     db: Session = Depends(get_db),
-    curr_user: User = Depends(get_current_user),
 ):
     try:
         study_session_service = StudySessionService(db)
-        return study_session_service.create_study_session(
+        return study_session_service.start_study_session(
             title=body.title,
             plan_id=body.plan_id,
-            topics=body.topics,
             description=body.description,
-            notes=body.notes,
-            started_at=body.started_at,
-            ended_at=body.ended_at,
-            total_pause_time=body.total_pause_time,
         )
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
@@ -50,11 +44,10 @@ def create_study_session(
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.post("/end/{study_session_id}", response_model=StudySessionResponse)
+@router.post("/end", response_model=StudySessionResponse)
 def end_study_session(
     study_session_id: uuid.UUID,
     db: Session = Depends(get_db),
-    curr_user: User = Depends(get_current_user),
 ):
     try:
         study_session_service = StudySessionService(db)
@@ -71,36 +64,10 @@ def end_study_session(
         raise HTTPException(status_code=409, detail=str(e))
 
 
-@router.put("/{study_session_id}", response_model=StudySessionResponse, status_code=201)
-def update_study_session(
-    study_session_id: uuid.UUID,
-    body: StudySessionUpdate,
+@router.get("/current", response_model=StudySessionResponse)
+def current_study_session(
     db: Session = Depends(get_db),
-    curr_user: User = Depends(get_current_user),
-):
-    try:
-        study_session_service = StudySessionService(db)
-        return study_session_service.update_study_session(
-            study_session_id=study_session_id,
-            title=body.title,
-            topics=body.topics,
-            description=body.description,
-            notes=body.notes,
-            started_at=body.started_at,
-            ended_at=body.ended_at,
-            total_pause_time=body.total_pause_time,
-        )
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
-    except RepositoryError as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
-
-@router.get("/{study_session_id}", response_model=StudySessionResponse)
-def retrieve_study_session(
-    study_session_id: uuid.UUID,
-    db: Session = Depends(get_db),
-    curr_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_current_user),
 ):
     try:
         study_session_service = StudySessionService(db)
