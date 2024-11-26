@@ -8,6 +8,7 @@ from models.course import Course
 from models.study_plan import StudyPlan
 from models.study_session import StudySession
 from models.term import Term
+from sqlalchemy.sql import func
 
 
 class StudySessionRepository(BaseRepository):
@@ -149,3 +150,27 @@ class StudySessionRepository(BaseRepository):
             raise RepositoryError(
                 f"Operation failed due to internal database error: {e}"
             ) from e
+
+    def get_study_time_by_course(self, curr_user_id: UUID) -> List[dict]:
+        try:
+            results = (
+                self.db.query(
+                    Course.name,
+                    func.sum(
+                        func.extract(
+                            "epoch", StudySession.ended_at - StudySession.started_at
+                        )
+                        - StudySession.total_pause_time
+                    ).label("time"),
+                )
+                .join(StudyPlan, StudySession.plan_id == StudyPlan.id)
+                .join(Course, StudyPlan.course_id == Course.id)
+                .join(Term, Course.term_id == Term.id)
+                .filter(Term.user_id == curr_user_id)
+                .group_by(Course.name)
+                .all()
+            )
+            return [{"course": row[0], "time": row[1]} for row in results]
+
+        except Exception as e:
+            raise RepositoryError(f"Failed to fetch study time by course: {e}") from e
