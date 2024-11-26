@@ -4,8 +4,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from api.routers import (
     assignment_router,
     course_router,
-    study_session_router,
     study_plan_router,
+    study_session_router,
     term_router,
     user_router,
 )
@@ -17,6 +17,7 @@ app.add_middleware(
     allow_origins=[
         "http://localhost:3000",
         "http://localhost:5173",
+        "http://localhost:5174",
         "http://d2a6-187-61-238-60.ngrok-free.app",
     ],
     allow_credentials=True,
