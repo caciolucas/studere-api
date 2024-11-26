@@ -19,6 +19,7 @@ from schemas.study_session_schemas import (
     StudySessionCreate,
     StudySessionResponse,
     StudySessionUpdate,
+    StudyTimeByCourseResponse,
 )
 from services.study_session_service import StudySessionService
 
@@ -168,3 +169,21 @@ def unpause_study_session(
         raise HTTPException(status_code=500, detail=str(e))
     except (PauseInactiveSessionError, SessionNotPausedError) as e:
         raise HTTPException(status_code=409, detail=str(e))
+
+
+@router.get("/study_time_by_course/", response_model=List[StudyTimeByCourseResponse])
+def get_study_time_by_course(
+    db: Session = Depends(get_db),
+    curr_user: User = Depends(get_current_user),
+):
+    try:
+        study_session_service = StudySessionService(db)
+
+        return study_session_service.get_study_time_by_discipline(curr_user.id)
+
+    except NotFoundError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+    except RepositoryError as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))

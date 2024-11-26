@@ -6,7 +6,7 @@ from core.exceptions import (
     RepositoryError,
     NotFoundError,
     OpenAIInvalidFormatError,
-    OpenAIAPIError
+    OpenAIAPIError,
 )
 from core.security import get_current_user
 from db.session import get_db
@@ -54,6 +54,27 @@ def get_study_plan(
         raise HTTPException(status_code=500, detail=str(e))
     except NotFoundError as e:
         raise HTTPException(status_code=404, detail=str(e))
+
+
+@router.get("/", response_model=StudyPlanResponse, status_code=201)
+def list_study_plans(
+    study_plan_id: uuid.UUID,
+    body: StudyPlanCreateUpdate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    try:
+        study_plan_service = StudyPlanService(db)
+        return study_plan_service.update_study_plan(
+            study_plan_id=study_plan_id,
+            title=body.title,
+            course_id=body.course_id,
+            topics=body.topics,
+        )
+    except RepositoryError as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    except NotFoundError as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
 
 @router.put("/{study_plan_id}", response_model=StudyPlanResponse, status_code=201)

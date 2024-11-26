@@ -56,3 +56,8 @@ class StudySessionResponse(StudySessionBase):
 
     class Config:
         from_attributes = True
+
+
+class StudyTimeByCourseResponse(BaseModel):
+    course: str
+    time: float

@@ -154,3 +154,9 @@ class StudySessionService(BaseService):
         # try to get it first, so if it doesnt exist
         self.retrieve_study_session(study_session_id)
         self.repository.delete_study_session(study_session_id)
+
+    def get_study_time_by_discipline(self, curr_user_id: UUID) -> List[dict]:
+        study_time = self.repository.get_study_time_by_course(curr_user_id)
+        if study_time is None:
+            raise NotFoundError(f"No study time data found for user {curr_user_id}")
+        return study_time
