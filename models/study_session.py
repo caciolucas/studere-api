@@ -1,8 +1,9 @@
-from typing import TYPE_CHECKING, List
 import uuid
+from datetime import datetime
 from enum import Enum
+from typing import TYPE_CHECKING, List
 
-from sqlalchemy import Boolean, Column, DateTime, Float, ForeignKey, String, Text, func
+from sqlalchemy import DateTime, Float, ForeignKey, String, Text, func
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -23,15 +24,15 @@ class StudySession(Base):
     __tablename__ = "study_sessions"
 
     id: Mapped[uuid.UUID] = mapped_column(
-        Column(UUID(as_uuid=True), primary_key=True, index=True, default=uuid.uuid4)
+        UUID(as_uuid=True), primary_key=True, index=True, default=uuid.uuid4
     )
-    title: Mapped[str] = mapped_column(Column(String, nullable=False))
-    description: Mapped[str] = mapped_column(Column(Text))
+    title: Mapped[str] = mapped_column(String, nullable=False)
+    description: Mapped[str] = mapped_column(Text)
 
-    notes = mapped_column(Column(Text, nullable=True))
+    notes = mapped_column(Text, nullable=True)
 
     plan_id: Mapped[uuid.UUID] = mapped_column(
-        Column(UUID(as_uuid=True), ForeignKey("study_plans.id"), nullable=False)
+        UUID(as_uuid=True), ForeignKey("study_plans.id"), nullable=False
     )
     plan: Mapped["StudyPlan"] = relationship("StudyPlan", back_populates="sessions")
 
@@ -40,12 +41,12 @@ class StudySession(Base):
     )
 
     status: Mapped[SessionState] = mapped_column(
-        Column(String, default=SessionState.ACTIVE.value)
+        String, default=SessionState.ACTIVE.value
     )
 
-    started_at = Column(DateTime, server_default=func.now())
-    ended_at = Column(DateTime, nullable=True)
+    started_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
+    ended_at: Mapped[datetime] = mapped_column(DateTime, nullable=True)
 
-    last_pause_time = Column(DateTime, nullable=True)
-    total_pause_time = Column(Float, default=0.0)
-    study_time = Column(Float, default=0.0)
+    last_pause_time: Mapped[datetime] = mapped_column(DateTime, nullable=True)
+    total_pause_time: Mapped[float] = mapped_column(Float, default=0.0)
+    study_time: Mapped[float] = mapped_column(Float, default=0.0)

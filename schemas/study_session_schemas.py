@@ -1,13 +1,14 @@
-from datetime import datetime, timezone
+from datetime import datetime
 from typing import List, Optional
 from uuid import UUID
 
 from pydantic import BaseModel
 
+from models.study_session import SessionState
 from schemas.study_plan_schemas import StudyPlanMinimalResponse, StudyPlanTopicResponse
 
 
-class StudySessionCreate(BaseModel):
+class StudySessionStart(BaseModel):
     title: str
     description: str
     plan_id: UUID
@@ -22,26 +23,19 @@ class StudySessionCreate(BaseModel):
         }
 
 
-class StudySessionBase(BaseModel):
+class StudySessionResponse(BaseModel):
+    id: UUID
     title: str
     description: Optional[str] = None
     notes: Optional[str] = None
+    topics: Optional[List[StudyPlanTopicResponse]] = None
+    plan: StudyPlanMinimalResponse
 
+    last_pause_time: Optional[datetime] = None
     started_at: datetime
     ended_at: Optional[datetime] = None
     total_pause_time: Optional[float] = None
-
-    is_active: Optional[bool] = None
-
-
-class StudySessionResponse(StudySessionBase):
-    id: UUID
-    topics: Optional[List[StudyPlanTopicResponse]] = None
-    plan: StudyPlanMinimalResponse
-    last_pause_time: Optional[datetime] = None
-
-    class Config:
-        from_attributes = True
+    status: SessionState
 
 
 class StudyTimeByCourseResponse(BaseModel):

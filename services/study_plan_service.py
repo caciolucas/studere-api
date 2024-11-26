@@ -4,12 +4,8 @@ from uuid import UUID
 
 from sqlalchemy.orm import Session
 
-from core.exceptions import (
-    NotFoundError,
-    OpenAIInvalidFormatError
-)
-
 from core.constants import DEFAULT_PROMPT, OPEN_AI_KEY
+from core.exceptions import NotFoundError, OpenAIInvalidFormatError
 from core.service import BaseService
 from models.study_plan import StudyPlan, StudyPlanTopic
 from repositories.study_plan_repository import StudyPlanRepository
@@ -60,7 +56,7 @@ class StudyPlanService(BaseService):
 
     def retrieve_study_plan(self, study_plan_id: UUID, current_user_id: UUID):
         study_plan = self.repository.retrieve_study_plan(study_plan_id)
-        if not study_plan or study_plan.course.user_id != current_user_id:
+        if not study_plan or study_plan.course.term.user_id != current_user_id:
             raise NotFoundError(f"Study plan not found: {study_plan_id} (user: {current_user_id})")
         return study_plan
 

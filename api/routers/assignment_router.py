@@ -1,9 +1,10 @@
+from typing import List
+from uuid import UUID
+
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from uuid import UUID
-from typing import List
 
-from core.exceptions import RepositoryError, NotFoundError
+from core.exceptions import NotFoundError, RepositoryError
 from core.security import get_current_user
 from db.session import get_db
 from models.user import User
@@ -37,6 +38,8 @@ def create_assignment(
         return assignment
     except RepositoryError as e:
         raise HTTPException(status_code=500, detail=str(e))
+    except NotFoundError as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
 
 @router.get("", response_model=List[AssignmentResponse])

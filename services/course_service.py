@@ -7,8 +7,8 @@ from core.exceptions import NotFoundError
 from core.service import BaseService
 from models.course import Course
 from repositories.course_repository import CourseRepository
-from services.user_service import UserService
 from services.term_service import TermService
+from services.user_service import UserService
 
 
 class CourseService(BaseService):
