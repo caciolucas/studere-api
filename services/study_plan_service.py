@@ -101,7 +101,7 @@ class StudyPlanService(BaseService):
         try:
             json_content = json.loads(response)
         except Exception as e:
-            raise OpenAIInvalidFormatError(f"Invalid OpenAI response format: {e}") from e
+            raise OpenAIInvalidFormatError(f"Invalid OpenAI response format:\n{e}") from e
 
         if isinstance(json_content, list):
             json_content = json_content[0]

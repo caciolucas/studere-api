@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from core.exceptions import RepositoryError
+from core.exceptions import DatabaseError
 from core.repository import BaseRepository
 from models.user import User
 
@@ -13,22 +13,22 @@ class UserRepository(BaseRepository):
             self.db.refresh(user)
             return user
         except Exception as e:
-            raise RepositoryError(
-                f"Operation failed due to internal database error: {e}"
+            raise DatabaseError(
+                f"Operation failed due to internal database error:\n{e}"
             ) from e
 
     def get_user_by_email(self, email: str) -> User:
         try:
             return self.db.query(User).filter(User.email == email).first()
         except Exception as e:
-            raise RepositoryError(
-                f"Operation failed due to internal database error: {e}"
+            raise DatabaseError(
+                f"Operation failed due to internal database error:\n{e}"
             ) from e
 
     def get_user_by_id(self, id: UUID) -> User:
         try:
             return self.db.query(User).filter(User.id == id).first()
         except Exception as e:
-            raise RepositoryError(
-                f"Operation failed due to internal database error: {e}"
+            raise DatabaseError(
+                f"Operation failed due to internal database error:\n{e}"
             ) from e

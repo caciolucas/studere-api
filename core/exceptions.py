@@ -1,163 +1,82 @@
-# --- App specific errors ---
+class DatabaseError(Exception):
+    """All database exceptions, ocurring on the repositories."""
+
+    status_code = 500
 
 
-class StudereError(Exception):
-    """Base class for all of our app's errors."""
+class NotFoundError(Exception):
+    """Raised when resource is not found."""
 
-    pass
-
-
-# --- Repository Errors ---
+    status_code = 404
 
 
-class RepositoryError(StudereError):
-    """Base class for repository exceptions."""
-
-    pass
-
-
-# --- Service Errors ---
-
-
-class ServiceError(StudereError):
-    """Base class for service exceptions."""
-
-    pass
-
-
-class NotFoundError(ServiceError):
-    pass
-
-
-class ValidationError(ServiceError):
+class ValidationError(Exception):
     """Raised when input data fails validation."""
 
     pass
 
 
-class OpenAIAPIError(ServiceError):
-    pass
+class OpenAIAPIError(Exception):
+    """Raised when OpenAI API fails in a general manner."""
+
+    status_code = 500
 
 
-class OpenAIInvalidFormatError(ServiceError):
-    pass
+class OpenAIInvalidFormatError(Exception):
+    """Raised when OpenAI API responds the user query with an invalid format."""
+
+    status_code = 500
 
 
-class PermissionError(ServiceError):
-    """Raised when a user lacks the required permissions."""
-
-    pass
-
-
-class ConflictError(ServiceError):
+class ConflictError(Exception):
     """Raised when there is a conflict, such as duplicate data."""
 
     pass
 
 
-# --- Authentication and Authorization ---
-class AuthenticationError(StudereError):
-    """Base class for authentication-related errors."""
-
-    pass
-
-
-class InvalidCredentialsError(AuthenticationError):
+class InvalidCredentialsError(Exception):
     """Raised when user credentials are invalid."""
 
-    pass
+    status_code = 401
 
 
-class TokenExpiredError(AuthenticationError):
+class RegisterEmailError(Exception):
+    """Raised when registration fails due to email already being in use."""
+
+    status_code = 409
+
+
+class TokenExpiredError(Exception):
     """Raised when an authentication token has expired."""
 
     pass
 
 
-class AuthorizationError(StudereError):
-    """Raised when a user tries to access something they are not authorized to."""
-
-    pass
-
-
-# --- Business Logic Specific ---
-class StudySessionError(StudereError):
-    """Base class for study session-related errors."""
-
-    pass
-
-
-class ActiveSessionExistsError(StudySessionError):
+class ActiveSessionExistsError(Exception):
     """Raised when a user tries to start a new session while one is already active."""
 
-    pass
+    status_code = 409
 
 
-class SessionAlreadyPausedError(StudySessionError):
+class SessionAlreadyPausedError(Exception):
     """Raised when a session is already paused."""
 
-    pass
+    status_code = 409
 
 
-class SessionAlreadyFinishedError(StudySessionError):
+class SessionAlreadyFinishedError(Exception):
     """Raised when a session is already finished."""
 
-    pass
+    status_code = 409
 
 
-class SessionNotPausedError(StudySessionError):
+class SessionNotPausedError(Exception):
     """Raised when trying to unpause a session that is not paused."""
 
-    pass
+    status_code = 409
 
 
-class PauseInactiveSessionError(StudySessionError):
+class PauseInactiveSessionError(Exception):
     """Raised when trying to unpause a session that is not active."""
 
-    pass
-
-
-# --- External API and Integration Exceptions ---
-
-
-class ExternalAPIError(StudereError):
-    """Base class for errors related to external APIs or integrations."""
-
-    pass
-
-
-class APIConnectionError(ExternalAPIError):
-    """Raised when there is a connection issue with an external API."""
-
-    pass
-
-
-class APITimeoutError(ExternalAPIError):
-    """Raised when an external API request times out."""
-
-    pass
-
-
-class APIDataError(ExternalAPIError):
-    """Raised when external API returns unexpected or invalid data."""
-
-    pass
-
-
-# --- General Utility Exceptions ---
-class ConfigurationError(StudereError):
-    """Raised for misconfigurations in the application."""
-
-    pass
-
-
-class RateLimitExceededError(StudereError):
-    """Raised when a user exceeds a rate limit."""
-
-    pass
-
-
-class OperationNotAllowedError(StudereError):
-    """Raised when an operation is not allowed in the current context."""
-
-    pass
+    status_code = 409

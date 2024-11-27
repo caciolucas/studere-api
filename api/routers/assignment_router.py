@@ -4,7 +4,6 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
-from core.exceptions import NotFoundError, RepositoryError
 from core.security import get_current_user
 from db.session import get_db
 from models.user import User
@@ -36,10 +35,11 @@ def create_assignment(
             score=body.score,
         )
         return assignment
-    except RepositoryError as e:
-        raise HTTPException(status_code=500, detail=str(e))
-    except NotFoundError as e:
-        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        raise HTTPException(
+            status_code=e.status_code if hasattr(e, 'status_code') else 500,
+            detail=str(e)
+        ) from e
 
 
 @router.get("", response_model=List[AssignmentResponse])
@@ -49,8 +49,11 @@ def list_assignments(
     try:
         assignment_service = AssignmentService(db)
         return assignment_service.list_assignments(current_user.id)
-    except RepositoryError as e:
-        raise HTTPException(status_code=500, detail=str(e))
+    except Exception as e:
+        raise HTTPException(
+            status_code=e.status_code if hasattr(e, 'status_code') else 500,
+            detail=str(e)
+        ) from e
 
 
 @router.get("/{assignment_id}", response_model=AssignmentResponse)
@@ -62,10 +65,11 @@ def get_assignment(
     try:
         assignment_service = AssignmentService(db)
         return assignment_service.retrieve_assignment(assignment_id, current_user.id)
-    except NotFoundError as e:
-        raise HTTPException(status_code=404, detail=str(e))
-    except RepositoryError as e:
-        raise HTTPException(status_code=500, detail=str(e))
+    except Exception as e:
+        raise HTTPException(
+            status_code=e.status_code if hasattr(e, 'status_code') else 500,
+            detail=str(e)
+        ) from e
 
 
 @router.put("/{assignment_id}", response_model=AssignmentResponse)
@@ -87,8 +91,11 @@ def update_assignment(
             score=body.score,
             current_user_id=current_user.id,
         )
-    except RepositoryError as e:
-        raise HTTPException(status_code=500, detail=str(e))
+    except Exception as e:
+        raise HTTPException(
+            status_code=e.status_code if hasattr(e, 'status_code') else 500,
+            detail=str(e)
+        ) from e
 
 
 @router.patch("/{assignment_id}", response_model=AssignmentResponse)
@@ -110,8 +117,11 @@ def partial_update_assignment(
             score=body.score,
             current_user_id=current_user.id,
         )
-    except RepositoryError as e:
-        raise HTTPException(status_code=500, detail=str(e))
+    except Exception as e:
+        raise HTTPException(
+            status_code=e.status_code if hasattr(e, 'status_code') else 500,
+            detail=str(e)
+        ) from e
 
 
 @router.delete("/{assignment_id}", status_code=204)
@@ -123,7 +133,8 @@ def delete_assignment(
     try:
         assignment_service = AssignmentService(db)
         assignment_service.delete_assignment(assignment_id, current_user.id)
-    except NotFoundError as e:
-        raise HTTPException(status_code=404, detail=str(e))
-    except RepositoryError as e:
-        raise HTTPException(status_code=500, detail=str(e))
+    except Exception as e:
+        raise HTTPException(
+            status_code=e.status_code if hasattr(e, 'status_code') else 500,
+            detail=str(e)
+        ) from e

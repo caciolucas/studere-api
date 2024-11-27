@@ -1,7 +1,7 @@
 from typing import List, Optional
 from uuid import UUID
 
-from core.exceptions import RepositoryError
+from core.exceptions import DatabaseError
 from core.repository import BaseRepository
 from models.course import Course
 from models.study_plan import StudyPlan, StudyPlanTopic
@@ -16,16 +16,16 @@ class StudyPlanRepository(BaseRepository):
             self.db.refresh(study_plan)
             return study_plan
         except Exception as e:
-            raise RepositoryError(
-                f"Operation failed due to internal database error: {e}"
+            raise DatabaseError(
+                f"Operation failed due to internal database error:\n{e}"
             ) from e
 
     def retrieve_study_plan(self, study_plan_id: UUID) -> StudyPlan:
         try:
             return self.db.query(StudyPlan).filter(StudyPlan.id == study_plan_id).first()
         except Exception as e:
-            raise RepositoryError(
-                f"Operation failed due to internal database error: {e}"
+            raise DatabaseError(
+                f"Operation failed due to internal database error:\n{e}"
             ) from e
 
     def retrieve_study_topic(self, study_topic_id: str) -> StudyPlanTopic:
@@ -36,8 +36,8 @@ class StudyPlanRepository(BaseRepository):
                 .first()
             )
         except Exception as e:
-            raise RepositoryError(
-                f"Operation failed due to internal database error: {e}"
+            raise DatabaseError(
+                f"Operation failed due to internal database error:\n{e}"
             ) from e
 
     def update_study_plan(self, study_plan: StudyPlan) -> StudyPlan:
@@ -47,8 +47,8 @@ class StudyPlanRepository(BaseRepository):
             self.db.refresh(study_plan)
             return study_plan
         except Exception as e:
-            raise RepositoryError(
-                f"Operation failed due to internal database error: {e}"
+            raise DatabaseError(
+                f"Operation failed due to internal database error:\n{e}"
             ) from e
 
     def delete_study_plan(self, study_plan_id: UUID) -> None:
@@ -57,8 +57,8 @@ class StudyPlanRepository(BaseRepository):
             self.db.delete(study_plan)
             self.db.commit()
         except Exception as e:
-            raise RepositoryError(
-                f"Operation failed due to internal database error: {e}"
+            raise DatabaseError(
+                f"Operation failed due to internal database error:\n{e}"
             ) from e
 
     def list_study_plans(
@@ -80,8 +80,8 @@ class StudyPlanRepository(BaseRepository):
                 )
             return self.db.query(StudyPlan).all()
         except Exception as e:
-            raise RepositoryError(
-                f"Operation failed due to internal database error: {e}"
+            raise DatabaseError(
+                f"Operation failed due to internal database error:\n{e}"
             ) from e
 
     def create_study_plan_topics(
@@ -94,8 +94,8 @@ class StudyPlanRepository(BaseRepository):
                 self.db.refresh(topic)
             return topics
         except Exception as e:
-            raise RepositoryError(
-                f"Operation failed due to internal database error: {e}"
+            raise DatabaseError(
+                f"Operation failed due to internal database error:\n{e}"
             ) from e
 
     def delete_study_plan_topics(self, topics_ids: List[str]) -> None:
@@ -109,6 +109,6 @@ class StudyPlanRepository(BaseRepository):
                 self.db.delete(topic)
             self.db.commit()
         except Exception as e:
-            raise RepositoryError(
-                f"Operation failed due to internal database error: {e}"
+            raise DatabaseError(
+                f"Operation failed due to internal database error:\n{e}"
             ) from e

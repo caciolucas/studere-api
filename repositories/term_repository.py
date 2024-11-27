@@ -1,7 +1,7 @@
 from uuid import UUID
 from typing import List
 
-from core.exceptions import RepositoryError
+from core.exceptions import DatabaseError
 from core.repository import BaseRepository
 from models.term import Term
 
@@ -14,16 +14,16 @@ class TermRepository(BaseRepository):
             self.db.refresh(term)
             return term
         except Exception as e:
-            raise RepositoryError(
-                f"Operation failed due to internal database error: {e}"
+            raise DatabaseError(
+                f"Operation failed due to internal database error:\n{e}"
             ) from e
 
     def retrieve_term(self, term_id: UUID) -> Term:
         try:
             return self.db.query(Term).filter(Term.id == term_id).first()
         except Exception as e:
-            raise RepositoryError(
-                f"Operation failed due to internal database error: {e}"
+            raise DatabaseError(
+                f"Operation failed due to internal database error:\n{e}"
             ) from e
 
     def update_term(self, term: Term) -> Term:
@@ -33,8 +33,8 @@ class TermRepository(BaseRepository):
             self.db.refresh(term)
             return term
         except Exception as e:
-            raise RepositoryError(
-                f"Operation failed due to internal database error: {e}"
+            raise DatabaseError(
+                f"Operation failed due to internal database error:\n{e}"
             ) from e
 
     def delete_term(self, term_id: UUID) -> None:
@@ -43,8 +43,8 @@ class TermRepository(BaseRepository):
             self.db.delete(term)
             self.db.commit()
         except Exception as e:
-            raise RepositoryError(
-                f"Operation failed due to internal database error: {e}"
+            raise DatabaseError(
+                f"Operation failed due to internal database error:\n{e}"
             ) from e
 
     def list_terms(self, user_id) -> List[Term]:
@@ -53,6 +53,6 @@ class TermRepository(BaseRepository):
                 return self.db.query(Term).filter(Term.user_id == user_id).all()
             return self.db.query(Term).all()
         except Exception as e:
-            raise RepositoryError(
-                f"Operation failed due to internal database error: {e}"
+            raise DatabaseError(
+                f"Operation failed due to internal database error:\n{e}"
             ) from e

@@ -3,7 +3,7 @@ from sqlalchemy.sql import func
 from typing import List
 from datetime import date, timedelta
 
-from core.exceptions import RepositoryError
+from core.exceptions import DatabaseError
 from core.repository import BaseRepository
 
 from models.course import Course
@@ -33,7 +33,7 @@ class DashboardRepository(BaseRepository):
             )
             return [{"course": row[0], "time": row[1]} for row in results]
         except Exception as e:
-            raise RepositoryError(f"Failed to fetch study time by course: {e}") from e
+            raise DatabaseError(f"Failed to fetch study time by course:\n{e}") from e
 
     def get_study_sessions_last_7_days(self, curr_user_id: UUID) -> List[dict]:
         try:
@@ -59,7 +59,7 @@ class DashboardRepository(BaseRepository):
 
             return [{"study_date": row.study_date, "session_count": row.session_count} for row in results]
         except Exception as e:
-            raise RepositoryError(f"Failed to fetch study sessions in the last 7 days: {e}") from e
+            raise DatabaseError(f"Failed to fetch study sessions in the last 7 days:\n{e}") from e
 
     def get_time_distribution(self, curr_user_id: UUID) -> List[dict]:
         try:
@@ -81,4 +81,4 @@ class DashboardRepository(BaseRepository):
 
             return [{"name": row.day_of_week.strip(), "time": row.total_time} for row in results]
         except Exception as e:
-            raise RepositoryError(f"Failed to fetch time distribution: {e}") from e
+            raise DatabaseError(f"Failed to fetch time distribution:\n{e}") from e

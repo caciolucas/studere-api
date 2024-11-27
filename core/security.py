@@ -41,7 +41,7 @@ def verify_token_and_get_user_id(token: str):
     except jwt.ExpiredSignatureError:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Token expirado",
+            detail="The authentication token is expired. Please login again.",
             headers={"WWW-Authenticate": "Bearer"},
         )
     except jwt.InvalidTokenError:
@@ -56,7 +56,7 @@ def get_current_user(
     if authorization is None:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Token não fornecido",
+            detail="No authentication token provided.",
             headers={"WWW-Authenticate": "Bearer"},
         )
 
@@ -66,13 +66,13 @@ def get_current_user(
         if scheme.lower() != "bearer":
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Tipo de token não suportado",
+                detail="Unsupported token type.",
                 headers={"WWW-Authenticate": "Bearer"},
             )
     except ValueError:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Token malformado",
+            detail="Malformed token.",
             headers={"WWW-Authenticate": "Bearer"},
         )
 
@@ -85,7 +85,7 @@ def get_current_user(
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Usuário não encontrado",
+            detail="User not found.",
             headers={"WWW-Authenticate": "Bearer"},
         )
 

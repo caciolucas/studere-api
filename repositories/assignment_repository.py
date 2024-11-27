@@ -1,7 +1,7 @@
 from typing import List, Optional
 from uuid import UUID
 
-from core.exceptions import RepositoryError
+from core.exceptions import DatabaseError
 from core.repository import BaseRepository
 from models.assignment import Assignment
 from models.course import Course
@@ -16,8 +16,8 @@ class AssignmentRepository(BaseRepository):
             self.db.refresh(assignment)
             return assignment
         except Exception as e:
-            raise RepositoryError(
-                f"Operation failed due to internal database error: {e}"
+            raise DatabaseError(
+                f"Operation failed due to internal database error:\n{e}"
             ) from e
 
     def retrieve_assignment(self, assignment_id: UUID) -> Assignment:
@@ -26,8 +26,8 @@ class AssignmentRepository(BaseRepository):
                 self.db.query(Assignment).filter(Assignment.id == assignment_id).first()
             )
         except Exception as e:
-            raise RepositoryError(
-                f"Operation failed due to internal database error: {e}"
+            raise DatabaseError(
+                f"Operation failed due to internal database error:\n{e}"
             ) from e
 
     def update_assignment(self, assignment: Assignment) -> Assignment:
@@ -37,8 +37,8 @@ class AssignmentRepository(BaseRepository):
             self.db.refresh(assignment)
             return assignment
         except Exception as e:
-            raise RepositoryError(
-                f"Operation failed due to internal database error: {e}"
+            raise DatabaseError(
+                f"Operation failed due to internal database error:\n{e}"
             )
 
     def delete_assignment(self, assignment_id: UUID) -> None:
@@ -50,8 +50,8 @@ class AssignmentRepository(BaseRepository):
             self.db.delete(assignment)
             self.db.commit()
         except Exception as e:
-            raise RepositoryError(
-                f"Operation failed due to internal database error: {e}"
+            raise DatabaseError(
+                f"Operation failed due to internal database error:\n{e}"
             )
 
     def list_assignments(
@@ -76,6 +76,6 @@ class AssignmentRepository(BaseRepository):
 
             return self.db.query(Assignment).all()
         except Exception as e:
-            raise RepositoryError(
-                f"Operation failed due to internal database error: {e}"
+            raise DatabaseError(
+                f"Operation failed due to internal database error:\n{e}"
             )

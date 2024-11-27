@@ -3,7 +3,6 @@ from sqlalchemy.orm import Session
 from uuid import UUID
 from typing import List
 
-from core.exceptions import RepositoryError, NotFoundError
 from core.security import get_current_user
 from db.session import get_db
 from models.user import User
@@ -23,8 +22,11 @@ def create_course(
     try:
         course_service = CourseService(db)
         return course_service.create_course(body.name, body.term_id)
-    except RepositoryError as e:
-        raise HTTPException(status_code=500, detail=str(e))
+    except Exception as e:
+        raise HTTPException(
+            status_code=e.status_code if hasattr(e, 'status_code') else 500,
+            detail=str(e)
+        ) from e
 
 
 @router.get("", response_model=List[CourseResponse])
@@ -34,8 +36,11 @@ def list_courses(
     try:
         course_service = CourseService(db)
         return course_service.list_courses(current_user.id)
-    except RepositoryError as e:
-        raise HTTPException(status_code=500, detail=str(e))
+    except Exception as e:
+        raise HTTPException(
+            status_code=e.status_code if hasattr(e, 'status_code') else 500,
+            detail=str(e)
+        ) from e
 
 
 @router.get("/{course_id}", response_model=CourseResponse)
@@ -47,10 +52,11 @@ def retrieve_course(
     try:
         course_service = CourseService(db)
         return course_service.retrieve_course(course_id, current_user.id)
-    except NotFoundError as e:
-        raise HTTPException(status_code=404, detail=str(e))
-    except RepositoryError as e:
-        raise HTTPException(status_code=500, detail=str(e))
+    except Exception as e:
+        raise HTTPException(
+            status_code=e.status_code if hasattr(e, 'status_code') else 500,
+            detail=str(e)
+        ) from e
 
 
 @router.put("/{course_id}", response_model=CourseResponse, status_code=201)
@@ -63,8 +69,11 @@ def update_course(
     try:
         course_service = CourseService(db)
         return course_service.update_course(course_id, current_user.id, body.name)
-    except RepositoryError as e:
-        raise HTTPException(status_code=500, detail=str(e))
+    except Exception as e:
+        raise HTTPException(
+            status_code=e.status_code if hasattr(e, 'status_code') else 500,
+            detail=str(e)
+        ) from e
 
 
 @router.delete("/{course_id}", status_code=204)
@@ -76,10 +85,11 @@ def delete_task(
     try:
         course_service = CourseService(db)
         course_service.delete_course(course_id, current_user.id)
-    except NotFoundError as e:
-        raise HTTPException(status_code=404, detail=str(e))
-    except RepositoryError as e:
-        raise HTTPException(status_code=500, detail=str(e))
+    except Exception as e:
+        raise HTTPException(
+            status_code=e.status_code if hasattr(e, 'status_code') else 500,
+            detail=str(e)
+        ) from e
 
 
 @router.get("/{course_id}/assignments", response_model=List[AssignmentResponse])
@@ -91,5 +101,8 @@ def list_course_assignments(
     try:
         assignment_service = AssignmentService(db)
         return assignment_service.list_assignments(current_user.id, course_id)
-    except RepositoryError as e:
-        raise HTTPException(status_code=500, detail=str(e))
+    except Exception as e:
+        raise HTTPException(
+            status_code=e.status_code if hasattr(e, 'status_code') else 500,
+            detail=str(e)
+        ) from e

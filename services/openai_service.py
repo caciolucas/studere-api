@@ -58,5 +58,5 @@ class OpenAIService:
             return response.choices[0].message.content.strip()
         except Exception as e:
             raise OpenAIAPIError(
-                f"OpenAI API error: {e}"
+                f"OpenAI API error:\n{e}"
             )

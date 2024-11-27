@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 
 from core.exceptions import (
     NotFoundError,
-    RepositoryError,
+    DatabaseError,
 )
 
 from core.security import get_current_user
@@ -27,12 +27,11 @@ def get_study_time_by_course(
     try:
         dashboard_service = DashboardService(db)
         return dashboard_service.get_study_time_by_course(curr_user.id)
-    except NotFoundError as e:
-        raise HTTPException(status_code=404, detail=str(e))
-    except RepositoryError as e:
-        raise HTTPException(status_code=500, detail=str(e))
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(
+            status_code=e.status_code if hasattr(e, 'status_code') else 500,
+            detail=str(e)
+        ) from e
 
 
 @router.get("/streaks", response_model=Dict[str, List[bool]])
@@ -44,12 +43,11 @@ def get_streaks(
         dashboard_service = DashboardService(db)
         streaks = dashboard_service.get_study_streaks(curr_user.id)
         return {"streaks": streaks}
-    except NotFoundError as e:
-        raise HTTPException(status_code=404, detail=str(e))
-    except RepositoryError as e:
-        raise HTTPException(status_code=500, detail=str(e))
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(
+            status_code=e.status_code if hasattr(e, 'status_code') else 500,
+            detail=str(e)
+        ) from e
 
 
 @router.get("/time-distribution")
@@ -61,9 +59,8 @@ def get_time_distribution(
         dashboard_service = DashboardService(db)
         data = dashboard_service.get_time_distribution(curr_user.id)
         return {"data": data}
-    except NotFoundError as e:
-        raise HTTPException(status_code=404, detail=str(e))
-    except RepositoryError as e:
-        raise HTTPException(status_code=500, detail=str(e))
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(
+            status_code=e.status_code if hasattr(e, 'status_code') else 500,
+            detail=str(e)
+        ) from e

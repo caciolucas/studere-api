@@ -1,7 +1,7 @@
 from typing import Optional
 from uuid import UUID
 
-from core.exceptions import RepositoryError
+from core.exceptions import DatabaseError
 from core.repository import BaseRepository
 from models.study_session import SessionState, StudySession
 
@@ -16,8 +16,8 @@ class StudySessionRepository(BaseRepository):
             return study_session
 
         except Exception as e:
-            raise RepositoryError(
-                f"Operation failed due to internal database error: {e}"
+            raise DatabaseError(
+                f"Operation failed due to internal database error:\n{e}"
             ) from e
 
     def retrieve_current_study_session_for_plan_id(
@@ -36,8 +36,8 @@ class StudySessionRepository(BaseRepository):
             )
 
         except Exception as e:
-            raise RepositoryError(
-                f"Operation failed due to internal database error: {e}"
+            raise DatabaseError(
+                f"Operation failed due to internal database error:\n{e}"
             ) from e
 
     def list_plan_sessions(self, plan_id: UUID) -> Optional[StudySession]:
@@ -49,6 +49,6 @@ class StudySessionRepository(BaseRepository):
             )
 
         except Exception as e:
-            raise RepositoryError(
-                f"Operation failed due to internal database error: {e}"
+            raise DatabaseError(
+                f"Operation failed due to internal database error:\n{e}"
             ) from e

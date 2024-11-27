@@ -1,7 +1,7 @@
 from typing import Optional
 from uuid import UUID
 
-from core.exceptions import RepositoryError
+from core.exceptions import DatabaseError
 from core.repository import BaseRepository
 from models.course import Course
 from models.term import Term
@@ -15,16 +15,16 @@ class CourseRepository(BaseRepository):
             self.db.refresh(course)
             return course
         except Exception as e:
-            raise RepositoryError(
-                f"Operation failed due to internal database error: {e}"
+            raise DatabaseError(
+                f"Operation failed due to internal database error:\n{e}"
             ) from e
 
     def retrieve_course(self, course_id: UUID) -> Course:
         try:
             return self.db.query(Course).filter(Course.id == course_id).first()
         except Exception as e:
-            raise RepositoryError(
-                f"Operation failed due to internal database error: {e}"
+            raise DatabaseError(
+                f"Operation failed due to internal database error:\n{e}"
             ) from e
 
     def update_course(self, course: Course) -> Course:
@@ -34,8 +34,8 @@ class CourseRepository(BaseRepository):
             self.db.refresh(course)
             return course
         except Exception as e:
-            raise RepositoryError(
-                f"Operation failed due to internal database error: {e}"
+            raise DatabaseError(
+                f"Operation failed due to internal database error:\n{e}"
             ) from e
 
     def delete_course(self, course_id: UUID) -> None:
@@ -44,8 +44,8 @@ class CourseRepository(BaseRepository):
             self.db.delete(course)
             self.db.commit()
         except Exception as e:
-            raise RepositoryError(
-                f"Operation failed due to internal database error: {e}"
+            raise DatabaseError(
+                f"Operation failed due to internal database error:\n{e}"
             ) from e
 
     def list_courses(
@@ -62,6 +62,6 @@ class CourseRepository(BaseRepository):
                 .all()
             )
         except Exception as e:
-            raise RepositoryError(
-                f"Operation failed due to internal database error: {e}"
+            raise DatabaseError(
+                f"Operation failed due to internal database error:\n{e}"
             ) from e

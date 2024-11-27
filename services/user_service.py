@@ -4,7 +4,7 @@ from uuid import UUID
 import bcrypt
 from sqlalchemy.orm import Session
 
-from core.exceptions import NotFoundError, ValidationError
+from core.exceptions import NotFoundError, InvalidCredentialsError, RegisterEmailError
 from core.security import create_access_token
 from core.service import BaseService
 from models.user import User
@@ -25,9 +25,7 @@ class UserService(BaseService):
         user = self.repository.get_user_by_email(email)
 
         if user:
-            raise ValueError(
-                f"This email is already in use: {email}."
-            )
+            raise RegisterEmailError(f"This email is already in use: {email}.")
 
         hashed_password = self.generate_hashed_password(password)
         new_user = User(email=email, password=hashed_password, full_name=full_name)
@@ -40,7 +38,7 @@ class UserService(BaseService):
             raise NotFoundError(f"User not found: {email}")
 
         if not self.compare_passwords(password, user.password):
-            raise ValidationError("Incorrect password! Please try again.")
+            raise InvalidCredentialsError("Incorrect password! Please try again.")
 
         token = create_access_token(
             data={"sub": str(user.id), "iat": datetime.now(timezone.utc)}
