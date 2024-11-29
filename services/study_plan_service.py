@@ -48,7 +48,7 @@ class StudyPlanService(BaseService):
             self.course_service.retrieve_course(course_id, user_id)
         return self.repository.list_study_plans(user_id, course_id)
 
-    def retrieve_study_topic(self, study_topic_id: str):
+    def retrieve_study_topic(self, study_topic_id: UUID):
         study_topic = self.repository.retrieve_study_topic(study_topic_id)
         if not study_topic:
             raise NotFoundError(f"Study topic not found: {study_topic_id}")
@@ -57,7 +57,9 @@ class StudyPlanService(BaseService):
     def retrieve_study_plan(self, study_plan_id: UUID, current_user_id: UUID):
         study_plan = self.repository.retrieve_study_plan(study_plan_id)
         if not study_plan or study_plan.course.term.user_id != current_user_id:
-            raise NotFoundError(f"Study plan not found: {study_plan_id} (user: {current_user_id})")
+            raise NotFoundError(
+                f"Study plan not found: {study_plan_id} (user: {current_user_id})"
+            )
         return study_plan
 
     def update_study_plan(
@@ -101,7 +103,9 @@ class StudyPlanService(BaseService):
         try:
             json_content = json.loads(response)
         except Exception as e:
-            raise OpenAIInvalidFormatError(f"Invalid OpenAI response format:\n{e}") from e
+            raise OpenAIInvalidFormatError(
+                f"Invalid OpenAI response format:\n{e}"
+            ) from e
 
         if isinstance(json_content, list):
             json_content = json_content[0]

@@ -10,7 +10,7 @@ from core.exceptions import (
     PauseInactiveSessionError,
     SessionAlreadyFinishedError,
     SessionNotPausedError,
-    ValidationError
+    ValidationError,
 )
 from core.service import BaseService
 from models.study_session import SessionState, StudySession
@@ -58,9 +58,7 @@ class StudySessionService(BaseService):
         description: Optional[str] = None,
     ) -> StudySession:
         if started_at > ended_at:
-            raise ValidationError(
-                "The start time cannot be after the end time."
-            )
+            raise ValidationError("The start time cannot be after the end time.")
 
         topics = (
             [
@@ -71,9 +69,8 @@ class StudySessionService(BaseService):
             else None
         )
 
-        study_time = (
-            (ended_at - started_at).total_seconds()
-            - timedelta(seconds=total_pause_time)
+        study_time = (ended_at - started_at).total_seconds() - timedelta(
+            seconds=total_pause_time
         )
 
         new_study_session = StudySession(
@@ -84,7 +81,7 @@ class StudySessionService(BaseService):
             ended_at=ended_at,
             total_pause_time=total_pause_time,
             status=SessionState.COMPLETED,
-            study_time=study_time
+            study_time=study_time,
         )
 
         return self.repository.save_study_session(new_study_session)
@@ -107,7 +104,7 @@ class StudySessionService(BaseService):
             )
 
         if study_session.status == SessionState.PAUSED.value:
-            self.unpause_study_session(study_session.id)
+            self.unpause_study_session(study_session.plan_id)
 
         study_session.status = SessionState.COMPLETED.value
         study_session.ended_at = datetime.now()
@@ -157,3 +154,18 @@ class StudySessionService(BaseService):
 
     def list_user_sesions(self, curr_user_id: UUID):
         return self.repository.list_user_sessions(curr_user_id)
+
+    def update_session(self, plan_id: UUID, notes: str, topics: List[UUID]):
+        study_session = self.repository.retrieve_current_study_session_for_plan_id(
+            plan_id
+        )
+        if not study_session:
+            raise NotFoundError(f"Study session not found: {plan_id}")
+        study_session.notes = notes
+
+        study_session.topics = [
+            self.study_plan_service.retrieve_study_topic(topic_id)
+            for topic_id in topics
+        ]
+
+        return self.repository.save_study_session(study_session)

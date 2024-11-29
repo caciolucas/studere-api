@@ -22,13 +22,15 @@ class StudyPlanRepository(BaseRepository):
 
     def retrieve_study_plan(self, study_plan_id: UUID) -> StudyPlan:
         try:
-            return self.db.query(StudyPlan).filter(StudyPlan.id == study_plan_id).first()
+            return (
+                self.db.query(StudyPlan).filter(StudyPlan.id == study_plan_id).first()
+            )
         except Exception as e:
             raise DatabaseError(
                 f"Operation failed due to internal database error:\n{e}"
             ) from e
 
-    def retrieve_study_topic(self, study_topic_id: str) -> StudyPlanTopic:
+    def retrieve_study_topic(self, study_topic_id: UUID) -> StudyPlanTopic:
         try:
             return (
                 self.db.query(StudyPlanTopic)
@@ -53,7 +55,9 @@ class StudyPlanRepository(BaseRepository):
 
     def delete_study_plan(self, study_plan_id: UUID) -> None:
         try:
-            study_plan = self.db.query(StudyPlan).filter(StudyPlan.id == study_plan_id).first()
+            study_plan = (
+                self.db.query(StudyPlan).filter(StudyPlan.id == study_plan_id).first()
+            )
             self.db.delete(study_plan)
             self.db.commit()
         except Exception as e:
@@ -67,7 +71,9 @@ class StudyPlanRepository(BaseRepository):
         try:
             if course_id:
                 return (
-                    self.db.query(StudyPlan).filter(StudyPlan.course_id == course_id).all()
+                    self.db.query(StudyPlan)
+                    .filter(StudyPlan.course_id == course_id)
+                    .all()
                 )
 
             if user_id:

@@ -41,3 +41,8 @@ class StudySessionResponse(BaseModel):
 class StudyTimeByCourseResponse(BaseModel):
     course: str
     time: float
+
+
+class StudySessionUpdate(BaseModel):
+    notes: str
+    topics: List[UUID]
