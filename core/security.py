@@ -28,7 +28,7 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
 def verify_token_and_get_user_id(token: str):
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Credenciais inválidas",
+        detail="Invalid credentials.",
         headers={"WWW-Authenticate": "Bearer"},
     )
 

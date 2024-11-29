@@ -4,12 +4,14 @@ from typing import List
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
+from core.security import get_current_user
 from db.session import get_db
 from schemas.study_session_schemas import (
     StudySessionResponse,
     StudySessionStart,
 )
 from services.study_session_service import StudySessionService
+from models.user import User
 
 router = APIRouter()
 
@@ -55,10 +57,26 @@ def end_study_session(plan_id: uuid.UUID, db: Session = Depends(get_db)):
 
 
 @router.get("/history/{plan_id}", response_model=List[StudySessionResponse])
-def list_study_sessions(plan_id: uuid.UUID, db: Session = Depends(get_db)):
+def list_plan_sessions(plan_id: uuid.UUID, db: Session = Depends(get_db)):
     try:
         study_session_service = StudySessionService(db)
-        return study_session_service.list_session_plan_history(plan_id)
+        return study_session_service.list_plan_sessions(plan_id)
+    except Exception as e:
+        raise HTTPException(
+            status_code=e.status_code if hasattr(e, 'status_code') else 500,
+            detail=str(e)
+        ) from e
+
+
+@router.get("/all", response_model=List[StudySessionResponse])
+def list_user_sessions(
+        plan_id: uuid.UUID,
+        db: Session = Depends(get_db),
+        curr_user: User = Depends(get_current_user)
+):
+    try:
+        study_session_service = StudySessionService(db)
+        return study_session_service.list_user_sessions(plan_id)
     except Exception as e:
         raise HTTPException(
             status_code=e.status_code if hasattr(e, 'status_code') else 500,

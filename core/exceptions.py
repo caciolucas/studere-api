@@ -13,7 +13,7 @@ class NotFoundError(Exception):
 class ValidationError(Exception):
     """Raised when input data fails validation."""
 
-    pass
+    status_code = 409
 
 
 class OpenAIAPIError(Exception):
@@ -44,12 +44,6 @@ class RegisterEmailError(Exception):
     """Raised when registration fails due to email already being in use."""
 
     status_code = 409
-
-
-class TokenExpiredError(Exception):
-    """Raised when an authentication token has expired."""
-
-    pass
 
 
 class ActiveSessionExistsError(Exception):

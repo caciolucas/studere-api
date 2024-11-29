@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta
-from typing import Optional
+from typing import Optional, List
 from uuid import UUID
 
 from sqlalchemy.orm import Session
@@ -10,6 +10,7 @@ from core.exceptions import (
     PauseInactiveSessionError,
     SessionAlreadyFinishedError,
     SessionNotPausedError,
+    ValidationError
 )
 from core.service import BaseService
 from models.study_session import SessionState, StudySession
@@ -26,6 +27,7 @@ class StudySessionService(BaseService):
         self,
         title: str,
         plan_id: UUID,
+        topics: Optional[List[UUID]] = None,
         description: Optional[str] = None,
     ) -> StudySession:
         active_study_session = (
@@ -41,6 +43,48 @@ class StudySessionService(BaseService):
             title=title,
             plan_id=plan_id,
             description=description,
+        )
+
+        return self.repository.save_study_session(new_study_session)
+
+    def create_completed_study_session(
+        self,
+        title: str,
+        plan_id: UUID,
+        started_at: datetime,
+        ended_at: datetime,
+        total_pause_time: float,
+        topics: Optional[List[UUID]] = None,
+        description: Optional[str] = None,
+    ) -> StudySession:
+        if started_at > ended_at:
+            raise ValidationError(
+                "The start time cannot be after the end time."
+            )
+
+        topics = (
+            [
+                self.study_plan_service.retrieve_study_topic(topic_id)
+                for topic_id in topics
+            ]
+            if topics
+            else None
+        )
+
+        study_time = (
+            (ended_at - started_at).total_seconds()
+            - timedelta(seconds=total_pause_time)
+        )
+
+        new_study_session = StudySession(
+            title=title,
+            plan_id=plan_id,
+            description=description,
+            started_at=started_at,
+            ended_at=ended_at,
+            total_pause_time=total_pause_time,
+            status=SessionState.COMPLETED,
+            study_time=study_time
         )
 
         return self.repository.save_study_session(new_study_session)
@@ -108,5 +152,8 @@ class StudySessionService(BaseService):
 
         return self.repository.save_study_session(study_session)
 
-    def list_session_plan_history(self, plan_id: UUID):
+    def list_plan_sessions(self, plan_id: UUID):
         return self.repository.list_plan_sessions(plan_id)
+
+    def list_user_sesions(self, curr_user_id: UUID):
+        return self.repository.list_user_sessions(curr_user_id)

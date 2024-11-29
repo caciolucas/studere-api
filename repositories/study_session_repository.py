@@ -1,9 +1,12 @@
-from typing import Optional
+from typing import Optional, List
 from uuid import UUID
 
 from core.exceptions import DatabaseError
 from core.repository import BaseRepository
 from models.study_session import SessionState, StudySession
+from models.study_plan import StudyPlan
+from models.course import Course
+from models.term import Term
 
 
 class StudySessionRepository(BaseRepository):
@@ -44,10 +47,28 @@ class StudySessionRepository(BaseRepository):
         try:
             return (
                 self.db.query(StudySession)
-                .filter(StudySession.plan_id == plan_id)
+                .filter(
+                    StudySession.plan_id == plan_id,
+                    StudySession.status == SessionState.COMPLETED.value
+                )
                 .all()
             )
 
+        except Exception as e:
+            raise DatabaseError(
+                f"Operation failed due to internal database error:\n{e}"
+            ) from e
+
+    def list_user_sessions(self, curr_user_id: UUID) -> List[StudySession]:
+        try:
+            return (
+                self.db.query(StudySession)
+                .join(StudyPlan, StudySession.plan_id == StudyPlan.id)
+                .join(Course, StudyPlan.course_id == Course.id)
+                .join(Term, Course.term_id == Term.id)
+                .filter(Term.user_id == curr_user_id)
+                .all()
+            )
         except Exception as e:
             raise DatabaseError(
                 f"Operation failed due to internal database error:\n{e}"
