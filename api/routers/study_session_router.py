@@ -120,3 +120,15 @@ def edit_notes(
             status_code=e.status_code if hasattr(e, "status_code") else 500,
             detail=str(e),
         ) from e
+
+
+@router.delete("/delete/{session_id}")
+def delete_session(session_id: uuid.UUID, db: Session = Depends(get_db)):
+    try:
+        study_session_service = StudySessionService(db)
+        study_session_service.delete_session(session_id)
+    except Exception as e:
+        raise HTTPException(
+            status_code=e.status_code if hasattr(e, "status_code") else 500,
+            detail=str(e),
+        ) from e

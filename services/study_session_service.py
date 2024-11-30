@@ -169,3 +169,6 @@ class StudySessionService(BaseService):
         ]
 
         return self.repository.save_study_session(study_session)
+
+    def delete_session(self, session_id: UUID):
+        self.repository.delete_session(session_id)

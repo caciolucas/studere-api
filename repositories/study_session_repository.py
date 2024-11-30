@@ -73,3 +73,13 @@ class StudySessionRepository(BaseRepository):
             raise DatabaseError(
                 f"Operation failed due to internal database error:\n{e}"
             ) from e
+
+    def delete_session(self, session_id: UUID) -> None:
+        try:
+            session = self.db.query(StudySession).filter(StudySession.id == session_id).first()
+            self.db.delete(session)
+            self.db.commit()
+        except Exception as e:
+            raise DatabaseError(
+                f"Operation failed due to internal database error:\n{e}"
+            ) from e
