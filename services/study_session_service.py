@@ -152,7 +152,7 @@ class StudySessionService(BaseService):
     def list_plan_sessions(self, plan_id: UUID):
         return self.repository.list_plan_sessions(plan_id)
 
-    def list_user_sesions(self, curr_user_id: UUID):
+    def list_user_sessions(self, curr_user_id: UUID):
         return self.repository.list_user_sessions(curr_user_id)
 
     def update_session(self, plan_id: UUID, notes: str, topics: List[UUID]):

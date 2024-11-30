@@ -71,13 +71,12 @@ def list_plan_sessions(plan_id: uuid.UUID, db: Session = Depends(get_db)):
 
 @router.get("/all", response_model=List[StudySessionResponse])
 def list_user_sessions(
-    plan_id: uuid.UUID,
     db: Session = Depends(get_db),
     curr_user: User = Depends(get_current_user),
 ):
     try:
         study_session_service = StudySessionService(db)
-        return study_session_service.list_user_sessions(plan_id)
+        return study_session_service.list_user_sessions(curr_user.id)
     except Exception as e:
         raise HTTPException(
             status_code=e.status_code if hasattr(e, "status_code") else 500,

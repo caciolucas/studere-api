@@ -35,6 +35,7 @@ class StudySessionResponse(BaseModel):
     started_at: datetime
     ended_at: Optional[datetime] = None
     total_pause_time: Optional[float] = None
+    study_time: Optional[float] = None
     status: SessionState
 
 
